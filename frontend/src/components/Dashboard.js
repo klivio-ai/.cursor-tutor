@@ -128,6 +128,9 @@ export function Dashboard() {
         <p className="text-gray-600 mt-2">Suivi financier de vos propriétés</p>
       </div>
 
+      {/* Data Management Section */}
+      <DataManagement onDataAdded={handleDataAdded} />
+
       {/* KPI Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
