@@ -129,12 +129,12 @@ export function DataManagement({ onDataAdded }) {
     try {
       const propertyData = {
         ...propertyForm,
-        rental_price: propertyForm.rental_price ? Number(propertyForm.rental_price) : null
+        monthly_rent: propertyForm.monthly_rent ? Number(propertyForm.monthly_rent) : null
       }
       
       await createProperty(propertyData)
       setMessage('✅ Propriété ajoutée avec succès!')
-      setPropertyForm({ name: '', address: '', type: 'Appartement', status: 'Vacant', rental_price: '' })
+      setPropertyForm({ name: '', address: '', type: 'Appartement', payment_status: 'En attente', monthly_rent: '' })
       if (onDataAdded) onDataAdded()
     } catch (error) {
       setMessage('❌ Erreur lors de l\'ajout de la propriété: ' + error.message)
