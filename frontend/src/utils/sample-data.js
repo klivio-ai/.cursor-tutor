@@ -18,7 +18,6 @@ const sampleData = {
       type: 'Appartement',
       status: 'Loué',
       purchase_price: 280000,
-      current_value: 320000,
       rental_price: 1200,
       description: 'Studio 30m² rénové'
     },
@@ -28,7 +27,6 @@ const sampleData = {
       type: 'Maison',
       status: 'Loué',
       purchase_price: 180000,
-      current_value: 220000,
       rental_price: 900,
       description: 'Maison 3 pièces avec jardin'
     },
@@ -38,7 +36,6 @@ const sampleData = {
       type: 'Studio',
       status: 'Vacant',
       purchase_price: 150000,
-      current_value: 165000,
       rental_price: 650,
       description: 'Studio 25m² centre-ville'
     }
