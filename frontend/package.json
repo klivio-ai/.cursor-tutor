@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "property-finance-dashboard",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,20 +8,19 @@
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cra-template": "1.2.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.26.1",
     "react-scripts": "5.0.1",
-    "recharts": "^3.0.2",
-    "tailwind-merge": "^3.3.1"
+    "recharts": "^2.12.7",
+    "tailwind-merge": "^2.5.2"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "browserslist": {
@@ -37,16 +36,18 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0",
-    "@eslint/js": "9.23.0",
+    "@eslint/js": "^8.57.0",
     "autoprefixer": "^10.4.20",
-    "eslint": "9.23.0",
-    "eslint-plugin-import": "2.31.0",
-    "eslint-plugin-jsx-a11y": "6.10.2",
-    "eslint-plugin-react": "7.37.4",
-    "globals": "15.15.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-react": "^7.37.0",
+    "globals": "^13.24.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
 }
