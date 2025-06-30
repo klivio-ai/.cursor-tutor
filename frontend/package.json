@@ -16,7 +16,7 @@
     "react-resize-detector": "^12.1.0",
     "react-router-dom": "^6.26.1",
     "react-scripts": "5.0.1",
-    "recharts": "2.7.3",
+    "recharts": "2.11.0",
     "reduce-css-calc": "^2.1.8",
     "tailwind-merge": "^2.5.2"
   },
