@@ -12,11 +12,8 @@ module.exports = {
     },
   },
   babel: {
-    plugins: [
-      // Only add React Refresh plugin in development mode, not in production builds
-      process.env.NODE_ENV === "development" && 
-      process.env.REACT_APP_FAST_REFRESH !== "false" &&
-      require.resolve("react-refresh/babel")
-    ].filter(Boolean),
+    plugins: process.env.NODE_ENV === "development" 
+      ? [require.resolve("react-refresh/babel")] 
+      : [],
   },
 }
