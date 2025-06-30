@@ -129,7 +129,7 @@
     implemented: true
     working: false
     file: "frontend/src/lib/supabase.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -142,6 +142,9 @@
       - working: false
         agent: "testing"
         comment: "Supabase connection is not working properly. The dashboard is stuck in a loading state. The Supabase URL and API key are hardcoded in the supabase.js file, but they might not be valid or accessible."
+      - working: false
+        agent: "testing"
+        comment: "Supabase connection fails with error: 'failed to parse select parameter (count(*))' (line 1, column 6). The connection test button shows this error, and network requests to fcnenhbjrblxaihksbtr.supabase.co are failing."
 
   - task: "Implement dashboard components with graphs and KPIs"
     implemented: true
@@ -160,6 +163,9 @@
       - working: false
         agent: "testing"
         comment: "Dashboard components are still not working. The dashboard is stuck in a loading state, possibly due to Supabase connection issues."
+      - working: false
+        agent: "testing"
+        comment: "Dashboard components are now visible but show empty data. Charts display 'Aucune donnée de revenu ou dépense disponible pour ce graphique'. The improved error handling is working as the dashboard shows empty states rather than being stuck in a loading state."
 
   - task: "Create data hooks for Supabase integration"
     implemented: true
@@ -178,6 +184,9 @@
       - working: false
         agent: "testing"
         comment: "Data hooks are still not working. The dashboard is stuck in a loading state, possibly due to Supabase connection issues."
+      - working: false
+        agent: "testing"
+        comment: "Data hooks are now handling errors properly and returning empty arrays instead of causing the app to be stuck in a loading state. Console logs show 'Failed to fetch' errors for all Supabase API calls."
 
   - task: "Implement main dashboard page"
     implemented: true
@@ -196,6 +205,9 @@
       - working: false
         agent: "testing"
         comment: "Dashboard page is still not working. The page is stuck in a loading state, possibly due to Supabase connection issues."
+      - working: false
+        agent: "testing"
+        comment: "Dashboard page now loads and displays the UI with empty data. The improved error handling allows the page to render even with Supabase connection issues. KPIs show 0,00 € values and charts show empty state messages."
 
 ## metadata:
   created_by: "main_agent"
