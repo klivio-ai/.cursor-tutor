@@ -22,8 +22,8 @@ export function DataManagement({ onDataAdded }) {
     name: '',
     address: '',
     type: 'Appartement',
-    status: 'Vacant',
-    rental_price: ''
+    payment_status: 'En attente',
+    monthly_rent: ''
   })
 
   const [revenueForm, setRevenueForm] = useState({
