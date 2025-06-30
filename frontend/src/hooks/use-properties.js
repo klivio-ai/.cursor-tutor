@@ -9,9 +9,16 @@ export function useProperties() {
   const fetchProperties = useCallback(async () => {
     try {
       setLoading(true)
+      setError(null)
+      
+      console.log('🔍 Fetching properties...')
+      
       const data = await getProperties()
+      console.log('✅ Properties fetched:', data.length)
+      
       setProperties(data)
     } catch (error) {
+      console.error('❌ Error fetching properties:', error)
       setError(error)
     } finally {
       setLoading(false)
