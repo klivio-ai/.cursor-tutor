@@ -5,11 +5,11 @@ import { supabase } from "@/lib/supabase"
 
 interface Expense {
   id: string
-  description: string
-  montant: number
+  property_id: string
+  amount: number
   date: string
-  categorie: string
-  propriete_id: string
+  description: string
+  category: string
   created_at: string
 }
 
@@ -19,22 +19,43 @@ export function useDepenses() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    async function fetchDepenses() {
+      try {
+        const { data, error } = await supabase.from("depenses").select("*").order("date", { ascending: false })
+
+        if (error) throw error
+
+        setDepenses(data || [])
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred")
+        // Fallback data for demo
+        setDepenses([
+          {
+            id: "1",
+            property_id: "1",
+            amount: 150,
+            date: "2024-01-12",
+            description: "Plumbing Repair",
+            category: "Maintenance",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "2",
+            property_id: "2",
+            amount: 80,
+            date: "2024-01-08",
+            description: "Cleaning Service",
+            category: "Maintenance",
+            created_at: new Date().toISOString(),
+          },
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchDepenses()
   }, [])
 
-  const fetchDepenses = async () => {
-    try {
-      setLoading(true)
-      const { data, error } = await supabase.from("depenses").select("*").order("date", { ascending: false })
-
-      if (error) throw error
-      setDepenses(data || [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return { depenses, loading, error, refetch: fetchDepenses }
+  return { depenses, loading, error }
 }
