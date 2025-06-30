@@ -229,14 +229,9 @@
 
 ## test_plan:
   current_focus:
-    - "Set up Supabase client configuration"
-    - "Implement dashboard components with graphs and KPIs"
-    - "Create data hooks for Supabase integration"
+    - "Sample data addition"
   stuck_tasks:
-    - "Set up Supabase client configuration"
-    - "Implement dashboard components with graphs and KPIs"
-    - "Create data hooks for Supabase integration"
-    - "Implement main dashboard page"
+    - "Sample data addition"
   test_all: false
   test_priority: "high_first"
 
