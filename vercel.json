@@ -1,0 +1,12 @@
+{
+  "buildCommand": "yarn build",
+  "outputDirectory": "frontend/build",
+  "framework": null,
+  "installCommand": "yarn install",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
