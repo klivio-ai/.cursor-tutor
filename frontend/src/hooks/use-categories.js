@@ -10,15 +10,20 @@ export function useCategories(type) {
     try {
       setLoading(true)
       setError(null)
+      
+      console.log('🔍 Fetching categories...', type ? `(type: ${type})` : '(all)')
+      
       const allCategories = await getCategories()
+      console.log('✅ Categories fetched:', allCategories.length)
+      
       if (type) {
         setCategories(allCategories.filter(c => c.type === type))
       } else {
         setCategories(allCategories)
       }
     } catch (err) {
-      console.error(`Error fetching categories:`, err)
-      setError(err instanceof Error ? err : new Error(`Failed to fetch categories`))
+      console.error(`❌ Error fetching categories:`, err)
+      setError(err instanceof Error ? err : new Error(`Failed to fetch categories: ${err.message || err}`))
     } finally {
       setLoading(false)
     }
