@@ -322,9 +322,9 @@ export function DataManagement({ onDataAdded }) {
                   onChange={(e) => setPropertyForm({...propertyForm, payment_status: e.target.value})}
                   className="w-full p-2 border rounded"
                 >
-                  <option value="En attente">En attente</option>
-                  <option value="Payé">Payé</option>
-                  <option value="En retard">En retard</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Overdue">Overdue</option>
                 </select>
                 <input
                   type="number"
