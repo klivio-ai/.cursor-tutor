@@ -16,28 +16,22 @@ const sampleData = {
       name: 'Appartement Paris 11ème',
       address: '15 Rue de la République, 75011 Paris',
       type: 'Appartement',
-      status: 'Loué',
-      purchase_price: 280000,
-      rental_price: 1200,
-      description: 'Studio 30m² rénové'
+      payment_status: 'Payé',
+      monthly_rent: 1200
     },
     {
       name: 'Maison Bordeaux',
       address: '8 Avenue Victor Hugo, 33000 Bordeaux',
       type: 'Maison',
-      status: 'Loué',
-      purchase_price: 180000,
-      rental_price: 900,
-      description: 'Maison 3 pièces avec jardin'
+      payment_status: 'Payé',
+      monthly_rent: 900
     },
     {
       name: 'Studio Lyon',
       address: '22 Rue de la Paix, 69001 Lyon', 
       type: 'Studio',
-      status: 'Vacant',
-      purchase_price: 150000,
-      rental_price: 650,
-      description: 'Studio 25m² centre-ville'
+      payment_status: 'En attente',
+      monthly_rent: 650
     }
   ]
 }
