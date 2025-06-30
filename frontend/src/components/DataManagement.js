@@ -8,6 +8,7 @@ export function DataManagement({ onDataAdded }) {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [showForms, setShowForms] = useState(false)
+  const [showSQL, setShowSQL] = useState(false)
 
   // Form states
   const [propertyForm, setPropertyForm] = useState({
