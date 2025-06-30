@@ -402,11 +402,28 @@ export function DataManagement({ onDataAdded }) {
                 />
                 <input
                   type="text"
-                  placeholder="ID Propriété (ex: prop-1)"
+                  placeholder="ID Propriété ou sélectionner"
                   value={expenseForm.property_id}
                   onChange={(e) => setExpenseForm({...expenseForm, property_id: e.target.value})}
                   className="w-full p-2 border rounded"
+                  list="properties-list-expense"
                 />
+                <datalist id="properties-list-expense">
+                  {properties?.map(prop => (
+                    <option key={prop.id} value={prop.id}>{prop.name}</option>
+                  ))}
+                </datalist>
+                <select
+                  value={expenseForm.category_id}
+                  onChange={(e) => setExpenseForm({...expenseForm, category_id: e.target.value})}
+                  required
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Sélectionner une catégorie</option>
+                  {categories?.filter(c => c.type === 'expense').map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
                 <input
                   type="date"
                   value={expenseForm.date}
