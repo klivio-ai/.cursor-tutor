@@ -5,11 +5,10 @@ export async function testSupabaseConnection() {
   try {
     console.log('🔍 Testing Supabase connection...')
     
-    // Simple connection test
-    const { data, error } = await supabase
+    // Simple connection test using select with count option
+    const { data, error, count } = await supabase
       .from('categories')
-      .select('count(*)')
-      .limit(1)
+      .select('*', { count: 'exact', head: true })
     
     if (error) {
       console.error('❌ Supabase connection failed:', error.message)
@@ -17,7 +16,7 @@ export async function testSupabaseConnection() {
     }
     
     console.log('✅ Supabase connection successful')
-    return { success: true, data }
+    return { success: true, count: count || 0 }
     
   } catch (error) {
     console.error('❌ Supabase connection error:', error)
@@ -32,15 +31,14 @@ export async function testTablesExist() {
   
   for (const table of tables) {
     try {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from(table)
-        .select('count(*)')
-        .limit(1)
+        .select('*', { count: 'exact', head: true })
       
       if (error) {
         results[table] = { exists: false, error: error.message }
       } else {
-        results[table] = { exists: true, count: data?.[0]?.count || 0 }
+        results[table] = { exists: true, count: count || 0 }
       }
     } catch (err) {
       results[table] = { exists: false, error: err.message }
