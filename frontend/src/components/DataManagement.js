@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { addSampleData, clearAllData } from '../utils/sample-data'
+import { createDatabaseTables, getManualSQLCommands } from '../utils/database-setup'
 import { createProperty, createRevenu, createDepense } from '../lib/data-service'
 import { Card, CardContent } from './ui/card'
 
