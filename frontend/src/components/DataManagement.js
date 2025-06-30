@@ -22,7 +22,7 @@ export function DataManagement({ onDataAdded }) {
     name: '',
     address: '',
     type: 'Appartement',
-    payment_status: 'En attente',
+    payment_status: 'Pending',
     monthly_rent: ''
   })
 
