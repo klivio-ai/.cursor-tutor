@@ -12,6 +12,10 @@ export function DataManagement({ onDataAdded }) {
   const [showForms, setShowForms] = useState(false)
   const [showSQL, setShowSQL] = useState(false)
 
+  // Get properties and categories for dropdowns
+  const { data: properties } = useProperties()
+  const { categories } = useCategories()
+
   // Form states
   const [propertyForm, setPropertyForm] = useState({
     name: '',
