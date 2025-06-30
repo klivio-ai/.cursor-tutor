@@ -1,52 +1,40 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { supabase } from "@/lib/supabase"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+interface Property {
+  id: string
+  nom: string
+  adresse: string
+  type: string
+  statut: string
+  prix_achat: number
+  created_at: string
+}
 
 export function useProperties() {
-  const [properties, setProperties] = useState([])
+  const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  const fetchProperties = async () => {
-    try {
-      setLoading(true)
-      const { data, error } = await supabase.from("properties").select("*").order("created_at", { ascending: false })
-
-      if (error) throw error
-      setProperties(data || [])
-    } catch (err: any) {
-      setError(err.message)
-      console.error("Error fetching properties:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProperties()
   }, [])
 
-  const addProperty = async (property: any) => {
+  const fetchProperties = async () => {
     try {
-      const { data, error } = await supabase.from("properties").insert([property]).select()
+      setLoading(true)
+      const { data, error } = await supabase.from("proprietes").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
-      setProperties((prev) => [data[0], ...prev])
-      return data[0]
-    } catch (err: any) {
-      setError(err.message)
-      throw err
+      setProperties(data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+    } finally {
+      setLoading(false)
     }
   }
 
-  return {
-    properties,
-    loading,
-    error,
-    addProperty,
-    refetch: fetchProperties,
-  }
+  return { properties, loading, error, refetch: fetchProperties }
 }

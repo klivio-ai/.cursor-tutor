@@ -1,14 +1,26 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { supabase } from "@/lib/supabase"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+interface Expense {
+  id: string
+  description: string
+  montant: number
+  date: string
+  categorie: string
+  propriete_id: string
+  created_at: string
+}
 
 export function useDepenses() {
-  const [depenses, setDepenses] = useState([])
+  const [depenses, setDepenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchDepenses()
+  }, [])
 
   const fetchDepenses = async () => {
     try {
@@ -17,36 +29,12 @@ export function useDepenses() {
 
       if (error) throw error
       setDepenses(data || [])
-    } catch (err: any) {
-      setError(err.message)
-      console.error("Error fetching depenses:", err)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchDepenses()
-  }, [])
-
-  const addDepense = async (depense: any) => {
-    try {
-      const { data, error } = await supabase.from("depenses").insert([depense]).select()
-
-      if (error) throw error
-      setDepenses((prev) => [data[0], ...prev])
-      return data[0]
-    } catch (err: any) {
-      setError(err.message)
-      throw err
-    }
-  }
-
-  return {
-    depenses,
-    loading,
-    error,
-    addDepense,
-    refetch: fetchDepenses,
-  }
+  return { depenses, loading, error, refetch: fetchDepenses }
 }

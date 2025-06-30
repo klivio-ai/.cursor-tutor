@@ -1,14 +1,23 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { supabase } from "@/lib/supabase"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+interface Category {
+  id: string
+  nom: string
+  type: "revenue" | "expense"
+  created_at: string
+}
 
 export function useCategories() {
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
 
   const fetchCategories = async () => {
     try {
@@ -17,36 +26,12 @@ export function useCategories() {
 
       if (error) throw error
       setCategories(data || [])
-    } catch (err: any) {
-      setError(err.message)
-      console.error("Error fetching categories:", err)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  const addCategory = async (category: any) => {
-    try {
-      const { data, error } = await supabase.from("categories").insert([category]).select()
-
-      if (error) throw error
-      setCategories((prev) => [...prev, data[0]])
-      return data[0]
-    } catch (err: any) {
-      setError(err.message)
-      throw err
-    }
-  }
-
-  return {
-    categories,
-    loading,
-    error,
-    addCategory,
-    refetch: fetchCategories,
-  }
+  return { categories, loading, error, refetch: fetchCategories }
 }
