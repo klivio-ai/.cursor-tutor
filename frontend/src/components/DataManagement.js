@@ -96,10 +96,7 @@ export function DataManagement({ onDataAdded }) {
     try {
       const propertyData = {
         ...propertyForm,
-        id: `prop-${Date.now()}`,
-        rental_price: propertyForm.rental_price ? Number(propertyForm.rental_price) : null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        rental_price: propertyForm.rental_price ? Number(propertyForm.rental_price) : null
       }
       
       await createProperty(propertyData)
@@ -120,12 +117,9 @@ export function DataManagement({ onDataAdded }) {
     try {
       const revenueData = {
         ...revenueForm,
-        id: `rev-${Date.now()}`,
         amount: Number(revenueForm.amount),
         status: 'Reçu',
-        paid: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        paid: true
       }
       
       await createRevenu(revenueData)
@@ -135,7 +129,7 @@ export function DataManagement({ onDataAdded }) {
         amount: '', 
         source: '', 
         property_id: '', 
-        category_id: 'cat-1',
+        category_id: '',
         date: new Date().toISOString().split('T')[0] 
       })
       if (onDataAdded) onDataAdded()
@@ -153,12 +147,9 @@ export function DataManagement({ onDataAdded }) {
     try {
       const expenseData = {
         ...expenseForm,
-        id: `exp-${Date.now()}`,
         amount: Number(expenseForm.amount),
         status: 'Payé',
-        paid: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        paid: true
       }
       
       await createDepense(expenseData)
@@ -168,7 +159,7 @@ export function DataManagement({ onDataAdded }) {
         amount: '', 
         vendor: '', 
         property_id: '', 
-        category_id: 'cat-2',
+        category_id: '',
         date: new Date().toISOString().split('T')[0] 
       })
       if (onDataAdded) onDataAdded()
