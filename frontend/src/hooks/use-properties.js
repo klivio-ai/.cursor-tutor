@@ -19,6 +19,7 @@ export function useProperties() {
       setProperties(data)
     } catch (error) {
       console.error('❌ Error fetching properties:', error)
+      console.error('Error details:', error.message, error.stack)
       setError(error)
     } finally {
       setLoading(false)
