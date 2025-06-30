@@ -37,6 +37,22 @@ export function DataManagement({ onDataAdded }) {
     date: new Date().toISOString().split('T')[0]
   })
 
+  const handleCreateTables = async () => {
+    setIsLoading(true)
+    setMessage('Création des tables de base de données...')
+    
+    const success = await createDatabaseTables()
+    
+    if (success) {
+      setMessage('✅ Tables de base de données créées avec succès!')
+    } else {
+      setMessage('❌ Impossible de créer les tables automatiquement. Veuillez consulter les commandes SQL manuelles.')
+      setShowSQL(true)
+    }
+    
+    setIsLoading(false)
+  }
+
   const handleAddSampleData = async () => {
     setIsLoading(true)
     setMessage('Ajout des données d\'exemple...')
