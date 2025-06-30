@@ -121,12 +121,15 @@
       - working: true
         agent: "testing"
         comment: "Verified all dependencies are correctly installed in package.json"
+      - working: true
+        agent: "testing"
+        comment: "Fixed recharts compatibility issues by installing react-resize-detector, reduce-css-calc, and react-is packages, and downgrading recharts to version 2.11.0"
 
   - task: "Set up Supabase client configuration"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/lib/supabase.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -136,12 +139,15 @@
       - working: true
         agent: "testing"
         comment: "Supabase client is correctly configured, but database tables don't exist yet"
+      - working: false
+        agent: "testing"
+        comment: "Supabase connection is not working properly. The dashboard is stuck in a loading state. The Supabase URL and API key are hardcoded in the supabase.js file, but they might not be valid or accessible."
 
   - task: "Implement dashboard components with graphs and KPIs"
     implemented: true
     working: false
     file: "frontend/src/components/dashboard/"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -151,12 +157,15 @@
       - working: false
         agent: "testing"
         comment: "Dashboard components are implemented but not working due to missing Supabase tables. Error: 'relation \"public.categories\" does not exist'"
+      - working: false
+        agent: "testing"
+        comment: "Dashboard components are still not working. The dashboard is stuck in a loading state, possibly due to Supabase connection issues."
 
   - task: "Create data hooks for Supabase integration"
     implemented: true
     working: false
     file: "frontend/src/hooks/"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -166,12 +175,15 @@
       - working: false
         agent: "testing"
         comment: "Data hooks are implemented but failing with error: 'relation does not exist' for all tables (categories, properties, revenues, expenses)"
+      - working: false
+        agent: "testing"
+        comment: "Data hooks are still not working. The dashboard is stuck in a loading state, possibly due to Supabase connection issues."
 
   - task: "Implement main dashboard page"
     implemented: true
     working: false
     file: "frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -181,6 +193,9 @@
       - working: false
         agent: "testing"
         comment: "Dashboard page shows error: 'relation \"public.revenues\" does not exist' instead of content"
+      - working: false
+        agent: "testing"
+        comment: "Dashboard page is still not working. The page is stuck in a loading state, possibly due to Supabase connection issues."
 
 ## metadata:
   created_by: "main_agent"
