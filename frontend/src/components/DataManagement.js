@@ -24,7 +24,7 @@ export function DataManagement({ onDataAdded }) {
     amount: '',
     source: '',
     property_id: '',
-    category_id: 'cat-1',
+    category_id: '',
     date: new Date().toISOString().split('T')[0]
   })
 
@@ -33,7 +33,7 @@ export function DataManagement({ onDataAdded }) {
     amount: '',
     vendor: '',
     property_id: '',
-    category_id: 'cat-2',
+    category_id: '',
     date: new Date().toISOString().split('T')[0]
   })
 
