@@ -16,21 +16,21 @@ const sampleData = {
       name: 'Appartement Paris 11ème',
       address: '15 Rue de la République, 75011 Paris',
       type: 'Appartement',
-      payment_status: 'Payé',
+      payment_status: 'Paid',
       monthly_rent: 1200
     },
     {
       name: 'Maison Bordeaux',
       address: '8 Avenue Victor Hugo, 33000 Bordeaux',
       type: 'Maison',
-      payment_status: 'Payé',
+      payment_status: 'Paid',
       monthly_rent: 900
     },
     {
       name: 'Studio Lyon',
       address: '22 Rue de la Paix, 69001 Lyon', 
       type: 'Studio',
-      payment_status: 'En attente',
+      payment_status: 'Pending',
       monthly_rent: 650
     }
   ]
