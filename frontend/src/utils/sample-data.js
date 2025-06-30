@@ -56,7 +56,7 @@ export async function addSampleData() {
     
     if (categoriesError) {
       console.error('Error adding categories:', categoriesError)
-      throw categoriesError
+      throw new Error(`Failed to add categories: ${categoriesError.message}`)
     }
     
     console.log('✅ Categories added:', categoriesData?.length || 0)
@@ -70,7 +70,7 @@ export async function addSampleData() {
     
     if (propertiesError) {
       console.error('Error adding properties:', propertiesError)
-      throw propertiesError
+      throw new Error(`Failed to add properties: ${propertiesError.message}`)
     }
     
     console.log('✅ Properties added:', propertiesData?.length || 0)
@@ -85,12 +85,16 @@ export async function addSampleData() {
       'Autres Revenus': categoriesData.find(c => c.name === 'Autres Revenus')?.id
     }
     
+    console.log('Category map:', categoryMap)
+    
     // Step 4: Create property lookup map
     const propertyMap = {
       'Appartement Paris 11ème': propertiesData.find(p => p.name === 'Appartement Paris 11ème')?.id,
       'Maison Bordeaux': propertiesData.find(p => p.name === 'Maison Bordeaux')?.id,
       'Studio Lyon': propertiesData.find(p => p.name === 'Studio Lyon')?.id
     }
+    
+    console.log('Property map:', propertyMap)
     
     // Step 5: Create revenues with proper UUID references
     console.log('Adding revenues...')
@@ -112,6 +116,8 @@ export async function addSampleData() {
       { description: 'Caution restituée', amount: 500, source: 'Ancien locataire', status: 'Reçu', paid: true, property_id: propertyMap['Studio Lyon'], category_id: categoryMap['Autres Revenus'], date: '2024-03-15' }
     ]
     
+    console.log('Sample revenue to add:', revenues[0])
+    
     const { data: revenuesData, error: revenuesError } = await supabase
       .from('revenues')
       .insert(revenues)
@@ -119,7 +125,7 @@ export async function addSampleData() {
     
     if (revenuesError) {
       console.error('Error adding revenues:', revenuesError)
-      throw revenuesError
+      throw new Error(`Failed to add revenues: ${revenuesError.message}`)
     }
     
     console.log('✅ Revenues added:', revenuesData?.length || 0)
@@ -141,6 +147,8 @@ export async function addSampleData() {
       { description: 'Assurance habitation', amount: 120, vendor: 'Assurances XYZ', status: 'Payé', paid: true, property_id: propertyMap['Studio Lyon'], category_id: categoryMap['Assurance'], date: '2024-01-10' }
     ]
     
+    console.log('Sample expense to add:', expenses[0])
+    
     const { data: expensesData, error: expensesError } = await supabase
       .from('expenses')
       .insert(expenses)
@@ -148,7 +156,7 @@ export async function addSampleData() {
     
     if (expensesError) {
       console.error('Error adding expenses:', expensesError)
-      throw expensesError
+      throw new Error(`Failed to add expenses: ${expensesError.message}`)
     }
     
     console.log('✅ Expenses added:', expensesData?.length || 0)
@@ -158,7 +166,7 @@ export async function addSampleData() {
     
   } catch (error) {
     console.error('❌ Error setting up sample data:', error)
-    return false
+    throw error
   }
 }
 
