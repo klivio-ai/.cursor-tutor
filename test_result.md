@@ -217,9 +217,9 @@
 
 ## test_plan:
   current_focus:
-    - "Install Supabase and chart dependencies"
     - "Set up Supabase client configuration"
     - "Implement dashboard components with graphs and KPIs"
+    - "Create data hooks for Supabase integration"
   stuck_tasks:
     - "Set up Supabase client configuration"
     - "Implement dashboard components with graphs and KPIs"
