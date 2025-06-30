@@ -219,3 +219,5 @@
 ## agent_communication:
   - agent: "main"
     message: "Successfully implemented complete property finance dashboard with Supabase integration. Created all chart components (CashflowChart, ExpensesPieChart, PropertyPerfChart), KPI cards, data hooks, and main Dashboard page. Fixed potential issues: improved date processing in charts, added proper error handling, currency formatting with EUR, and better data validation. Ready for testing."
+  - agent: "testing"
+    message: "Testing revealed that the dashboard is stuck in a loading state. Fixed recharts compatibility issues by installing react-resize-detector, reduce-css-calc, and react-is packages, and downgrading recharts to version 2.11.0. However, the dashboard is still not loading properly. The issue appears to be with the Supabase connection. The Supabase URL and API key are hardcoded in the supabase.js file, but they might not be valid or accessible. The dashboard cannot connect to Supabase to create tables or load data."
