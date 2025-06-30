@@ -34,26 +34,38 @@ export function Dashboard() {
   const { 
     data: properties, 
     isLoading: isLoadingProperties, 
-    error: errorProperties 
+    error: errorProperties,
+    refetch: refetchProperties
   } = useProperties()
   
   const { 
     data: revenus, 
     isLoading: isLoadingRevenus, 
-    error: errorRevenus 
+    error: errorRevenus,
+    refetch: refetchRevenus
   } = useRevenus()
   
   const { 
     data: expenses, 
     isLoading: isLoadingExpenses, 
-    error: errorExpenses 
+    error: errorExpenses,
+    refetch: refetchExpenses
   } = useDepenses()
 
   const {
     categories,
     loading: isLoadingCategories,
-    error: errorCategories
+    error: errorCategories,
+    fetchCategories: refetchCategories
   } = useCategories()
+
+  // Function to refresh all data
+  const handleDataAdded = () => {
+    refetchProperties()
+    refetchRevenus()
+    refetchExpenses()
+    refetchCategories()
+  }
 
   // Loading and error states
   const isLoading = isLoadingProperties || isLoadingRevenus || isLoadingExpenses || isLoadingCategories
