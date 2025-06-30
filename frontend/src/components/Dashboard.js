@@ -5,6 +5,7 @@ import { useDepenses } from '../hooks/use-depenses'
 import { useCategories } from '../hooks/use-categories'
 import { StatCard } from './dashboard/StatCard'
 import { RecentTransactions } from './dashboard/RecentTransactions'
+import { DataManagement } from './DataManagement'
 import { LoadingCard } from './ui/loading'
 import { formatCurrency } from '../lib/utils'
 
