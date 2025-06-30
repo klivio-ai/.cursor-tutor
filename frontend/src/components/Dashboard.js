@@ -67,8 +67,8 @@ export function Dashboard() {
     refetchCategories()
   }
 
-  // Loading and error states
-  const isLoading = isLoadingProperties || isLoadingRevenus || isLoadingExpenses || isLoadingCategories
+  // Force bypass loading state for testing
+  const isLoading = false // isLoadingProperties || isLoadingRevenus || isLoadingExpenses || isLoadingCategories
   const error = errorProperties || errorRevenus || errorExpenses || errorCategories
   
   // Debug logging
