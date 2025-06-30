@@ -44,6 +44,32 @@ export function DataManagement({ onDataAdded }) {
     date: new Date().toISOString().split('T')[0]
   })
 
+  const handleTestConnection = async () => {
+    setIsLoading(true)
+    setMessage('Test de la connexion Supabase...')
+    
+    const connectionResult = await testSupabaseConnection()
+    
+    if (connectionResult.success) {
+      const tablesResult = await testTablesExist()
+      
+      let statusMessage = '✅ Connexion Supabase réussie!\n\nÉtat des tables:\n'
+      Object.entries(tablesResult).forEach(([table, result]) => {
+        if (result.exists) {
+          statusMessage += `• ${table}: ✅ (${result.count || 0} entrées)\n`
+        } else {
+          statusMessage += `• ${table}: ❌ ${result.error}\n`
+        }
+      })
+      
+      setMessage(statusMessage)
+    } else {
+      setMessage(`❌ Erreur de connexion Supabase: ${connectionResult.error}`)
+    }
+    
+    setIsLoading(false)
+  }
+
   const handleCreateTables = async () => {
     setIsLoading(true)
     setMessage('Création des tables de base de données...')
