@@ -208,7 +208,11 @@
     - "Install Supabase and chart dependencies"
     - "Set up Supabase client configuration"
     - "Implement dashboard components with graphs and KPIs"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Set up Supabase client configuration"
+    - "Implement dashboard components with graphs and KPIs"
+    - "Create data hooks for Supabase integration"
+    - "Implement main dashboard page"
   test_all: false
   test_priority: "high_first"
 
