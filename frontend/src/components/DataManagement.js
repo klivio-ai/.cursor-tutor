@@ -309,6 +309,15 @@ export function DataManagement({ onDataAdded }) {
                   className="w-full p-2 border rounded"
                 />
                 <select
+                  value={propertyForm.type}
+                  onChange={(e) => setPropertyForm({...propertyForm, type: e.target.value})}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="Appartement">Appartement</option>
+                  <option value="Maison">Maison</option>
+                  <option value="Studio">Studio</option>
+                </select>
+                <select
                   value={propertyForm.payment_status}
                   onChange={(e) => setPropertyForm({...propertyForm, payment_status: e.target.value})}
                   className="w-full p-2 border rounded"
