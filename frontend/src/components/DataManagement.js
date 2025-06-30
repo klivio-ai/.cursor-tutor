@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { addSampleData, clearAllData } from '../utils/sample-data'
 import { createDatabaseTables, getManualSQLCommands } from '../utils/database-setup'
 import { createProperty, createRevenu, createDepense } from '../lib/data-service'
+import { useProperties } from '../hooks/use-properties'
+import { useCategories } from '../hooks/use-categories'
 import { Card, CardContent } from './ui/card'
 
 export function DataManagement({ onDataAdded }) {
