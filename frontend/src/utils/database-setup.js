@@ -22,7 +22,6 @@ const createTablesSQL = {
       type TEXT NOT NULL,
       status TEXT NOT NULL,
       purchase_price NUMERIC,
-      current_value NUMERIC,
       rental_price NUMERIC,
       description TEXT,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
