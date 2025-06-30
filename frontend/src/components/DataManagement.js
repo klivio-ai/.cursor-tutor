@@ -234,6 +234,24 @@ export function DataManagement({ onDataAdded }) {
         </CardContent>
       </Card>
 
+      {/* Manual SQL Commands */}
+      {showSQL && (
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="text-lg font-semibold mb-4">Commandes SQL Manuelles</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Copiez et collez ce SQL dans votre Supabase Dashboard → SQL Editor → New Query:
+            </p>
+            <pre className="bg-gray-100 p-4 rounded text-xs overflow-x-auto">
+              {getManualSQLCommands()}
+            </pre>
+            <p className="text-sm text-gray-600 mt-4">
+              Après avoir exécuté le SQL, cliquez sur "Ajouter Données d'Exemple" pour peupler la base.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Forms */}
       {showForms && (
         <div className="grid gap-4 md:grid-cols-3">
