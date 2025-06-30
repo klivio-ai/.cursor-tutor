@@ -113,11 +113,14 @@
     file: "package.json"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Successfully installed @supabase/supabase-js, recharts, lucide-react, date-fns and other dependencies"
+      - working: true
+        agent: "testing"
+        comment: "Verified all dependencies are correctly installed in package.json"
 
   - task: "Set up Supabase client configuration"
     implemented: true
@@ -125,47 +128,59 @@
     file: "frontend/src/lib/supabase.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Created Supabase client with provided credentials"
+      - working: true
+        agent: "testing"
+        comment: "Supabase client is correctly configured, but database tables don't exist yet"
 
   - task: "Implement dashboard components with graphs and KPIs"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/components/dashboard/"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implemented CashflowChart, ExpensesPieChart, PropertyPerfChart, StatCard with improved error handling and data validation"
+      - working: false
+        agent: "testing"
+        comment: "Dashboard components are implemented but not working due to missing Supabase tables. Error: 'relation \"public.categories\" does not exist'"
 
   - task: "Create data hooks for Supabase integration"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/hooks/"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implemented useProperties, useRevenus, useDepenses, useCategories hooks"
+      - working: false
+        agent: "testing"
+        comment: "Data hooks are implemented but failing with error: 'relation does not exist' for all tables (categories, properties, revenues, expenses)"
 
   - task: "Implement main dashboard page"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Replaced basic app with comprehensive Dashboard component with KPIs and charts"
+      - working: false
+        agent: "testing"
+        comment: "Dashboard page shows error: 'relation \"public.revenues\" does not exist' instead of content"
 
 ## metadata:
   created_by: "main_agent"
