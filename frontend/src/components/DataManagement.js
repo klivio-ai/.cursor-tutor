@@ -259,7 +259,7 @@ export function DataManagement({ onDataAdded }) {
           </div>
           
           {message && (
-            <div className={`p-3 rounded ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            <div className={`p-3 rounded whitespace-pre-line ${message.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {message}
             </div>
           )}
