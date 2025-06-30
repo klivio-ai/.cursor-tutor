@@ -134,7 +134,7 @@ export function DataManagement({ onDataAdded }) {
       
       await createProperty(propertyData)
       setMessage('✅ Propriété ajoutée avec succès!')
-      setPropertyForm({ name: '', address: '', type: 'Appartement', payment_status: 'En attente', monthly_rent: '' })
+      setPropertyForm({ name: '', address: '', type: 'Appartement', payment_status: 'Pending', monthly_rent: '' })
       if (onDataAdded) onDataAdded()
     } catch (error) {
       setMessage('❌ Erreur lors de l\'ajout de la propriété: ' + error.message)
