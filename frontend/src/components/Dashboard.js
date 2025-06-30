@@ -70,6 +70,26 @@ export function Dashboard() {
   // Loading and error states
   const isLoading = isLoadingProperties || isLoadingRevenus || isLoadingExpenses || isLoadingCategories
   const error = errorProperties || errorRevenus || errorExpenses || errorCategories
+  
+  // Debug logging
+  console.log('Debug - Loading states:', { 
+    isLoadingProperties, 
+    isLoadingRevenus, 
+    isLoadingExpenses, 
+    isLoadingCategories 
+  })
+  console.log('Debug - Error states:', { 
+    errorProperties, 
+    errorRevenus, 
+    errorExpenses, 
+    errorCategories 
+  })
+  console.log('Debug - Data:', { 
+    propertiesCount: properties?.length || 0, 
+    revenusCount: revenus?.length || 0, 
+    expensesCount: expenses?.length || 0, 
+    categoriesCount: categories?.length || 0 
+  })
 
   // Financial metrics calculation
   const financialMetrics = useMemo(() => {
