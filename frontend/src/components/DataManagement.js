@@ -309,19 +309,19 @@ export function DataManagement({ onDataAdded }) {
                   className="w-full p-2 border rounded"
                 />
                 <select
-                  value={propertyForm.type}
-                  onChange={(e) => setPropertyForm({...propertyForm, type: e.target.value})}
+                  value={propertyForm.payment_status}
+                  onChange={(e) => setPropertyForm({...propertyForm, payment_status: e.target.value})}
                   className="w-full p-2 border rounded"
                 >
-                  <option value="Appartement">Appartement</option>
-                  <option value="Maison">Maison</option>
-                  <option value="Studio">Studio</option>
+                  <option value="En attente">En attente</option>
+                  <option value="Payé">Payé</option>
+                  <option value="En retard">En retard</option>
                 </select>
                 <input
                   type="number"
                   placeholder="Loyer mensuel (€)"
-                  value={propertyForm.rental_price}
-                  onChange={(e) => setPropertyForm({...propertyForm, rental_price: e.target.value})}
+                  value={propertyForm.monthly_rent}
+                  onChange={(e) => setPropertyForm({...propertyForm, monthly_rent: e.target.value})}
                   className="w-full p-2 border rounded"
                 />
                 <button
