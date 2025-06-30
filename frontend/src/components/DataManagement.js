@@ -188,6 +188,14 @@ export function DataManagement({ onDataAdded }) {
           
           <div className="flex flex-wrap gap-2 mb-4">
             <button
+              onClick={handleCreateTables}
+              disabled={isLoading}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+            >
+              {isLoading ? 'Création...' : 'Créer Tables DB'}
+            </button>
+            
+            <button
               onClick={handleAddSampleData}
               disabled={isLoading}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
@@ -208,6 +216,13 @@ export function DataManagement({ onDataAdded }) {
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
               {showForms ? 'Masquer' : 'Afficher'} Formulaires
+            </button>
+            
+            <button
+              onClick={() => setShowSQL(!showSQL)}
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
+              {showSQL ? 'Masquer' : 'Afficher'} SQL Manuel
             </button>
           </div>
           
