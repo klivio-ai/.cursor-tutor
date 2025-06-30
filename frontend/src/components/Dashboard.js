@@ -129,6 +129,7 @@ export function Dashboard() {
   }
 
   if (error) {
+    console.error('Dashboard error:', error)
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -136,6 +137,15 @@ export function Dashboard() {
           <p className="text-red-600">
             {typeof error === 'string' ? error : error.message || 'Une erreur est survenue'}
           </p>
+          <div className="mt-4 text-sm text-red-500">
+            <p>Détails des erreurs:</p>
+            <ul className="list-disc pl-5 mt-2">
+              {errorProperties && <li>Propriétés: {errorProperties.toString()}</li>}
+              {errorRevenus && <li>Revenus: {errorRevenus.toString()}</li>}
+              {errorExpenses && <li>Dépenses: {errorExpenses.toString()}</li>}
+              {errorCategories && <li>Catégories: {errorCategories.toString()}</li>}
+            </ul>
+          </div>
         </div>
       </div>
     )
