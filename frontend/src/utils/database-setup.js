@@ -22,6 +22,7 @@ const createTablesSQL = {
       type TEXT NOT NULL,
       status TEXT NOT NULL,
       purchase_price NUMERIC,
+      current_value NUMERIC,
       rental_price NUMERIC,
       description TEXT,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -74,13 +75,44 @@ export async function createDatabaseTables() {
   console.log('🏗️ Creating database tables...')
   
   try {
-    console.log('ℹ️ Note: Tables should be created manually in Supabase SQL Editor')
-    console.log('The automatic table creation via RPC is not available.')
+    // Create tables in correct order (dependencies first)
+    const tableOrder = ['categories', 'properties', 'revenues', 'expenses']
     
-    return false // Always return false to show manual SQL instructions
+    for (const tableName of tableOrder) {
+      console.log(`Creating table: ${tableName}`)
+      
+      const { data, error } = await supabase.rpc('execute_sql', {
+        sql: createTablesSQL[tableName]
+      })
+      
+      if (error) {
+        console.error(`Error creating ${tableName} table:`, error)
+        // Try alternative method using direct SQL execution
+        const { error: directError } = await supabase
+          .from('_placeholder_') // This will fail but we'll use the connection
+          .select('*')
+        
+        // If RPC doesn't work, we'll need to create tables manually
+        throw new Error(`Could not create table ${tableName}. You may need to create tables manually in Supabase dashboard.`)
+      } else {
+        console.log(`✅ Table ${tableName} created successfully`)
+      }
+    }
+    
+    console.log('🎉 All database tables created successfully!')
+    return true
     
   } catch (error) {
     console.error('❌ Error creating database tables:', error)
+    
+    // Provide manual SQL for user to run in Supabase dashboard
+    console.log('\n📋 Please run the following SQL in your Supabase SQL Editor:')
+    console.log('\n' + '='.repeat(50))
+    Object.values(createTablesSQL).forEach(sql => {
+      console.log(sql + '\n')
+    })
+    console.log('='.repeat(50))
+    
     return false
   }
 }

@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkproperty_finance_dashboard=self.webpackChunkproperty_finance_dashboard||[]).push([[48],{2048:(e,n,t)=>{var r=function(){if("undefined"!==typeof self)return self;if("undefined"!==typeof window)return window;if("undefined"!==typeof t.g)return t.g;throw new Error("unable to locate global object")}();e.exports=n=r.fetch,r.fetch&&(n.default=r.fetch.bind(r)),n.Headers=r.Headers,n.Request=r.Request,n.Response=r.Response}}]);
-//# sourceMappingURL=48.6a397106.chunk.js.map

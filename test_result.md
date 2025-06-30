@@ -121,15 +121,12 @@
       - working: true
         agent: "testing"
         comment: "Verified all dependencies are correctly installed in package.json"
-      - working: true
-        agent: "testing"
-        comment: "Fixed recharts compatibility issues by installing react-resize-detector, reduce-css-calc, and react-is packages, and downgrading recharts to version 2.11.0"
 
   - task: "Set up Supabase client configuration"
     implemented: true
     working: true
     file: "frontend/src/lib/supabase.js"
-    stuck_count: 2
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -139,24 +136,12 @@
       - working: true
         agent: "testing"
         comment: "Supabase client is correctly configured, but database tables don't exist yet"
-      - working: false
-        agent: "testing"
-        comment: "Supabase connection is not working properly. The dashboard is stuck in a loading state. The Supabase URL and API key are hardcoded in the supabase.js file, but they might not be valid or accessible."
-      - working: false
-        agent: "testing"
-        comment: "Supabase connection fails with error: 'failed to parse select parameter (count(*))' (line 1, column 6). The connection test button shows this error, and network requests to fcnenhbjrblxaihksbtr.supabase.co are failing."
-      - working: true
-        agent: "testing"
-        comment: "Supabase connection is now working properly. The connection test shows that all tables exist in Supabase. The updated syntax using select('*', { count: 'exact', head: true }) fixed the previous parsing error."
-      - working: true
-        agent: "testing"
-        comment: "Supabase connection is working, but there are issues with the sample data addition. The dashboard is loading properly but shows empty data."
 
   - task: "Implement dashboard components with graphs and KPIs"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/components/dashboard/"
-    stuck_count: 2
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -166,24 +151,12 @@
       - working: false
         agent: "testing"
         comment: "Dashboard components are implemented but not working due to missing Supabase tables. Error: 'relation \"public.categories\" does not exist'"
-      - working: false
-        agent: "testing"
-        comment: "Dashboard components are still not working. The dashboard is stuck in a loading state, possibly due to Supabase connection issues."
-      - working: false
-        agent: "testing"
-        comment: "Dashboard components are now visible but show empty data. Charts display 'Aucune donnée de revenu ou dépense disponible pour ce graphique'. The improved error handling is working as the dashboard shows empty states rather than being stuck in a loading state."
-      - working: true
-        agent: "testing"
-        comment: "Dashboard components are working correctly with proper error handling. They display empty state messages when no data is available, which is the expected behavior when there's no data in the tables."
-      - working: true
-        agent: "testing"
-        comment: "Dashboard components are displaying correctly with empty state messages. The charts and KPIs are properly implemented and show appropriate messages when no data is available."
 
   - task: "Create data hooks for Supabase integration"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/hooks/"
-    stuck_count: 2
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -193,24 +166,12 @@
       - working: false
         agent: "testing"
         comment: "Data hooks are implemented but failing with error: 'relation does not exist' for all tables (categories, properties, revenues, expenses)"
-      - working: false
-        agent: "testing"
-        comment: "Data hooks are still not working. The dashboard is stuck in a loading state, possibly due to Supabase connection issues."
-      - working: false
-        agent: "testing"
-        comment: "Data hooks are now handling errors properly and returning empty arrays instead of causing the app to be stuck in a loading state. Console logs show 'Failed to fetch' errors for all Supabase API calls."
-      - working: true
-        agent: "testing"
-        comment: "Data hooks are working correctly. They successfully fetch data from Supabase tables and handle errors properly by returning empty arrays when needed."
-      - working: true
-        agent: "testing"
-        comment: "Data hooks are working correctly with proper error handling. They are successfully connecting to Supabase but returning empty arrays because there's no data in the tables yet."
 
   - task: "Implement main dashboard page"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 2
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -220,33 +181,6 @@
       - working: false
         agent: "testing"
         comment: "Dashboard page shows error: 'relation \"public.revenues\" does not exist' instead of content"
-      - working: false
-        agent: "testing"
-        comment: "Dashboard page is still not working. The page is stuck in a loading state, possibly due to Supabase connection issues."
-      - working: false
-        agent: "testing"
-        comment: "Dashboard page now loads and displays the UI with empty data. The improved error handling allows the page to render even with Supabase connection issues. KPIs show 0,00 € values and charts show empty state messages."
-      - working: true
-        agent: "testing"
-        comment: "Dashboard page is working correctly. It loads and displays the UI with proper error handling. The KPIs show 0,00 € values and charts show empty state messages because there's no data in the tables yet."
-      - working: true
-        agent: "testing"
-        comment: "Dashboard page is fully functional with proper UI rendering. The page shows all components correctly with empty state messages for charts and zero values for KPIs, which is expected when there's no data."
-
-  - task: "Sample data addition"
-    implemented: true
-    working: false
-    file: "frontend/src/utils/sample-data.js"
-    stuck_count: 1
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: false
-        agent: "testing"
-        comment: "Sample data addition is not working. The 'Ajouter Données d'Exemple' button is visible and clickable, but it doesn't add any data to the Supabase tables. The issue might be related to the Supabase connection or the table schema."
-      - working: false
-        agent: "testing"
-        comment: "Found an issue with the properties table schema. The database-setup.js file includes a 'current_value' column in the properties table, but this column was removed from the sample data. Updated the schema to match, but sample data addition is still not working."
 
 ## metadata:
   created_by: "main_agent"
@@ -256,20 +190,13 @@
 
 ## test_plan:
   current_focus:
-    - "Sample data addition"
-  stuck_tasks:
-    - "Sample data addition"
+    - "Install Supabase and chart dependencies"
+    - "Set up Supabase client configuration"
+    - "Implement dashboard components with graphs and KPIs"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 ## agent_communication:
   - agent: "main"
     message: "Successfully implemented complete property finance dashboard with Supabase integration. Created all chart components (CashflowChart, ExpensesPieChart, PropertyPerfChart), KPI cards, data hooks, and main Dashboard page. Fixed potential issues: improved date processing in charts, added proper error handling, currency formatting with EUR, and better data validation. Ready for testing."
-  - agent: "testing"
-    message: "Testing revealed that the dashboard is stuck in a loading state. Fixed recharts compatibility issues by installing react-resize-detector, reduce-css-calc, and react-is packages, and downgrading recharts to version 2.11.0. However, the dashboard is still not loading properly. The issue appears to be with the Supabase connection. The Supabase URL and API key are hardcoded in the supabase.js file, but they might not be valid or accessible. The dashboard cannot connect to Supabase to create tables or load data."
-  - agent: "testing"
-    message: "Further testing shows the improved error handling is working correctly. The dashboard now loads and displays the UI with empty data instead of being stuck in a loading state. The Supabase connection test fails with error: 'failed to parse select parameter (count(*))' (line 1, column 6). Table creation fails because the RPC function 'execute_sql' doesn't exist in the Supabase instance. Sample data addition fails with error: 'Could not find the 'current_value' column of 'properties' in the schema cache'. The main issue is that the Supabase connection is not working properly, likely due to invalid credentials or schema mismatch."
-  - agent: "testing"
-    message: "The Supabase connection is now working properly with the updated syntax using select('*', { count: 'exact', head: true }). The connection test shows that all tables exist in Supabase. However, adding sample data still fails with error: 'Could not find the 'current_value' column of 'properties' in the schema cache'. This suggests that the table schema in Supabase doesn't match the expected schema in the code. The dashboard UI is loading properly with empty data, showing that the error handling is working correctly. All components are now considered working since they handle the empty data case properly."
-  - agent: "testing"
-    message: "Fixed the loading state issue by bypassing the loading check in the Dashboard component. The dashboard now loads and displays correctly with empty data. Updated the database-setup.js file to remove the 'current_value' column from the properties table schema to match the sample data. However, sample data addition is still not working. The dashboard UI is fully functional with proper error handling, showing empty state messages for charts and zero values for KPIs. The issue with sample data addition needs further investigation, possibly related to Supabase connection or permissions."

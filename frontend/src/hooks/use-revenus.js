@@ -1,31 +1,50 @@
-import { useState, useEffect, useCallback } from "react"
-import { getRevenus } from "../lib/data-service.js"
+"use client"
+
+import { useState, useEffect } from "react"
+import { supabase } from "../lib/supabase"
 
 export function useRevenus() {
   const [revenus, setRevenus] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchRevenus = useCallback(async () => {
+  const fetchRevenus = async () => {
     try {
       setLoading(true)
-      const data = await getRevenus()
-      setRevenus(data)
-    } catch (error) {
-      setError(error)
+      const { data, error } = await supabase.from("revenus").select("*").order("date", { ascending: false })
+
+      if (error) throw error
+      setRevenus(data || [])
+    } catch (err) {
+      setError(err.message)
+      console.error("Error fetching revenus:", err)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }
 
   useEffect(() => {
     fetchRevenus()
-  }, [fetchRevenus])
+  }, [])
+
+  const addRevenu = async (revenu) => {
+    try {
+      const { data, error } = await supabase.from("revenus").insert([revenu]).select()
+
+      if (error) throw error
+      setRevenus((prev) => [data[0], ...prev])
+      return data[0]
+    } catch (err) {
+      setError(err.message)
+      throw err
+    }
+  }
 
   return {
-    data: revenus,
-    isLoading: loading,
-    error: error?.message || null,
+    revenus,
+    loading,
+    error,
+    addRevenu,
     refetch: fetchRevenus,
   }
 }
