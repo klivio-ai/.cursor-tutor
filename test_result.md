@@ -200,3 +200,5 @@
 ## agent_communication:
   - agent: "main"
     message: "Successfully implemented complete property finance dashboard with Supabase integration. Created all chart components (CashflowChart, ExpensesPieChart, PropertyPerfChart), KPI cards, data hooks, and main Dashboard page. Fixed potential issues: improved date processing in charts, added proper error handling, currency formatting with EUR, and better data validation. Ready for testing."
+  - agent: "main"
+    message: "DEPLOYMENT ISSUE FIXED: Resolved React Refresh Babel plugin configuration issue in craco.config.js that was causing production build failures. Modified babel plugin configuration to properly handle development vs production environments. Build now succeeds without React Refresh errors."
