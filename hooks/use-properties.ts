@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
-type Property = Database["public"]["Tables"]["properties"]["Row"]
+type Property = Database["public"]["Tables"]["properties"]["Row"] & {
+  tenant?: Database["public"]["Tables"]["tenants"]["Row"]
+}
 type PropertyInsert = Database["public"]["Tables"]["properties"]["Insert"]
 type PropertyUpdate = Database["public"]["Tables"]["properties"]["Update"]
 
@@ -16,7 +18,13 @@ export function useProperties() {
   const fetchProperties = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("properties").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase
+        .from("properties")
+        .select(`
+          *,
+          tenant:tenants(*)
+        `)
+        .order("created_at", { ascending: false })
 
       if (error) throw error
       setProperties(data || [])

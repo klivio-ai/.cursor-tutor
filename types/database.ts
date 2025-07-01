@@ -28,8 +28,10 @@ export interface Database {
           type?: string
           color?: string | null
           description?: string | null
+          created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: []
       }
       expenses: {
         Row: {
@@ -80,8 +82,25 @@ export interface Database {
           due_date?: string | null
           date?: string
           file_url?: string | null
+          created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -117,8 +136,25 @@ export interface Database {
           method?: string | null
           notes?: string | null
           user_id?: string | null
+          created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       properties: {
         Row: {
@@ -159,9 +195,19 @@ export interface Database {
           payment_status?: string
           next_due_date?: string | null
           user_id?: string | null
+          created_at?: string
           updated_at?: string
           rental_price?: number | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "properties_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       revenues: {
         Row: {
@@ -209,8 +255,25 @@ export interface Database {
           category_id?: string
           date?: string
           file_url?: string | null
+          created_at?: string | null
           updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "revenues_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "revenues_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tenants: {
         Row: {
@@ -237,9 +300,23 @@ export interface Database {
           email?: string | null
           phone_number?: string | null
           user_id?: string | null
+          created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

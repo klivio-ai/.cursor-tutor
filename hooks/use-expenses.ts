@@ -4,7 +4,10 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
-type Expense = Database["public"]["Tables"]["expenses"]["Row"]
+type Expense = Database["public"]["Tables"]["expenses"]["Row"] & {
+  property?: Database["public"]["Tables"]["properties"]["Row"]
+  category?: Database["public"]["Tables"]["categories"]["Row"]
+}
 type ExpenseInsert = Database["public"]["Tables"]["expenses"]["Insert"]
 type ExpenseUpdate = Database["public"]["Tables"]["expenses"]["Update"]
 
@@ -16,7 +19,14 @@ export function useExpenses() {
   const fetchExpenses = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("expenses").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase
+        .from("expenses")
+        .select(`
+          *,
+          property:properties(*),
+          category:categories(*)
+        `)
+        .order("created_at", { ascending: false })
 
       if (error) throw error
       setExpenses(data || [])
@@ -29,7 +39,15 @@ export function useExpenses() {
 
   const createExpense = async (expense: ExpenseInsert) => {
     try {
-      const { data, error } = await supabase.from("expenses").insert(expense).select().single()
+      const { data, error } = await supabase
+        .from("expenses")
+        .insert(expense)
+        .select(`
+          *,
+          property:properties(*),
+          category:categories(*)
+        `)
+        .single()
 
       if (error) throw error
       setExpenses((prev) => [data, ...prev])
@@ -42,7 +60,16 @@ export function useExpenses() {
 
   const updateExpense = async (id: string, updates: ExpenseUpdate) => {
     try {
-      const { data, error } = await supabase.from("expenses").update(updates).eq("id", id).select().single()
+      const { data, error } = await supabase
+        .from("expenses")
+        .update(updates)
+        .eq("id", id)
+        .select(`
+          *,
+          property:properties(*),
+          category:categories(*)
+        `)
+        .single()
 
       if (error) throw error
       setExpenses((prev) => prev.map((exp) => (exp.id === id ? data : exp)))

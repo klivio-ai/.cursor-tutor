@@ -3,12 +3,12 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useAuth } from "@/hooks/use-auth"
 import { toast } from "sonner"
 
 export function AuthForm() {
@@ -21,38 +21,44 @@ export function AuthForm() {
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await signIn(email, password)
-
-    if (error) {
-      toast.error(error.message)
-    } else {
-      toast.success("Signed in successfully!")
+    try {
+      const { error } = await signIn(email, password)
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success("Signed in successfully!")
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await signUp(email, password)
-
-    if (error) {
-      toast.error(error.message)
-    } else {
-      toast.success("Check your email to confirm your account!")
+    try {
+      const { error } = await signUp(email, password)
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success("Account created successfully! Please check your email to verify your account.")
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome</CardTitle>
-          <CardDescription>Sign in to your account or create a new one</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">Property Manager</CardTitle>
+          <CardDescription className="text-center">Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
@@ -60,18 +66,25 @@ export function AuthForm() {
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
-
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -82,7 +95,6 @@ export function AuthForm() {
                 </Button>
               </form>
             </TabsContent>
-
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
@@ -90,6 +102,7 @@ export function AuthForm() {
                   <Input
                     id="signup-email"
                     type="email"
+                    placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -100,6 +113,7 @@ export function AuthForm() {
                   <Input
                     id="signup-password"
                     type="password"
+                    placeholder="Create a password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

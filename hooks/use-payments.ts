@@ -4,7 +4,10 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
-type Payment = Database["public"]["Tables"]["payments"]["Row"]
+type Payment = Database["public"]["Tables"]["payments"]["Row"] & {
+  property?: Database["public"]["Tables"]["properties"]["Row"]
+  tenant?: Database["public"]["Tables"]["tenants"]["Row"]
+}
 type PaymentInsert = Database["public"]["Tables"]["payments"]["Insert"]
 type PaymentUpdate = Database["public"]["Tables"]["payments"]["Update"]
 
@@ -16,7 +19,14 @@ export function usePayments() {
   const fetchPayments = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("payments").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase
+        .from("payments")
+        .select(`
+          *,
+          property:properties(*),
+          tenant:tenants(*)
+        `)
+        .order("created_at", { ascending: false })
 
       if (error) throw error
       setPayments(data || [])
@@ -29,7 +39,15 @@ export function usePayments() {
 
   const createPayment = async (payment: PaymentInsert) => {
     try {
-      const { data, error } = await supabase.from("payments").insert(payment).select().single()
+      const { data, error } = await supabase
+        .from("payments")
+        .insert(payment)
+        .select(`
+          *,
+          property:properties(*),
+          tenant:tenants(*)
+        `)
+        .single()
 
       if (error) throw error
       setPayments((prev) => [data, ...prev])
@@ -42,7 +60,16 @@ export function usePayments() {
 
   const updatePayment = async (id: string, updates: PaymentUpdate) => {
     try {
-      const { data, error } = await supabase.from("payments").update(updates).eq("id", id).select().single()
+      const { data, error } = await supabase
+        .from("payments")
+        .update(updates)
+        .eq("id", id)
+        .select(`
+          *,
+          property:properties(*),
+          tenant:tenants(*)
+        `)
+        .single()
 
       if (error) throw error
       setPayments((prev) => prev.map((payment) => (payment.id === id ? data : payment)))

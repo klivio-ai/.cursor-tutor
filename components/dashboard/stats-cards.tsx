@@ -1,62 +1,60 @@
-"use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useProperties } from "@/hooks/use-properties"
-import { useRevenues } from "@/hooks/use-revenues"
-import { useExpenses } from "@/hooks/use-expenses"
-import { useTenants } from "@/hooks/use-tenants"
 import { Building2, Users, TrendingUp, TrendingDown } from "lucide-react"
 
-export function StatsCards() {
-  const { properties } = useProperties()
-  const { revenues } = useRevenues()
-  const { expenses } = useExpenses()
-  const { tenants } = useTenants()
+interface StatsCardsProps {
+  totalProperties: number
+  totalTenants: number
+  totalRevenue: number
+  totalExpenses: number
+}
 
-  const totalRevenue = revenues.reduce((sum, revenue) => sum + Number(revenue.amount), 0)
-  const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+export function StatsCards({ totalProperties, totalTenants, totalRevenue, totalExpenses }: StatsCardsProps) {
   const netIncome = totalRevenue - totalExpenses
-
-  const stats = [
-    {
-      title: "Total Properties",
-      value: properties.length,
-      icon: Building2,
-      color: "text-blue-600",
-    },
-    {
-      title: "Total Tenants",
-      value: tenants.length,
-      icon: Users,
-      color: "text-green-600",
-    },
-    {
-      title: "Total Revenue",
-      value: `$${totalRevenue.toLocaleString()}`,
-      icon: TrendingUp,
-      color: "text-emerald-600",
-    },
-    {
-      title: "Total Expenses",
-      value: `$${totalExpenses.toLocaleString()}`,
-      icon: TrendingDown,
-      color: "text-red-600",
-    },
-  ]
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <Card key={stat.title}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <stat.icon className={`h-4 w-4 ${stat.color}`} />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-          </CardContent>
-        </Card>
-      ))}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{totalProperties}</div>
+          <p className="text-xs text-muted-foreground">Active properties</p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Tenants</CardTitle>
+          <Users className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{totalTenants}</div>
+          <p className="text-xs text-muted-foreground">Registered tenants</p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+          <p className="text-xs text-muted-foreground">All time revenue</p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Net Income</CardTitle>
+          <TrendingDown className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className={`text-2xl font-bold ${netIncome >= 0 ? "text-green-600" : "text-red-600"}`}>
+            ${netIncome.toLocaleString()}
+          </div>
+          <p className="text-xs text-muted-foreground">Revenue - Expenses</p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
