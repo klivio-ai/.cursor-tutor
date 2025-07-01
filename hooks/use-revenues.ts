@@ -4,10 +4,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
-type Revenue = Database["public"]["Tables"]["revenues"]["Row"] & {
-  property?: Database["public"]["Tables"]["properties"]["Row"]
-  category?: Database["public"]["Tables"]["categories"]["Row"]
-}
+type Revenue = Database["public"]["Tables"]["revenues"]["Row"]
 type RevenueInsert = Database["public"]["Tables"]["revenues"]["Insert"]
 type RevenueUpdate = Database["public"]["Tables"]["revenues"]["Update"]
 
@@ -19,65 +16,40 @@ export function useRevenues() {
   const fetchRevenues = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from("revenues")
-        .select(`
-          *,
-          property:properties(*),
-          category:categories(*)
-        `)
-        .order("date", { ascending: false })
+      const { data, error } = await supabase.from("revenues").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
       setRevenues(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Error fetching revenues:", err)
     } finally {
       setLoading(false)
     }
   }
 
-  const addRevenue = async (revenue: RevenueInsert) => {
+  const createRevenue = async (revenue: RevenueInsert) => {
     try {
-      const { data, error } = await supabase
-        .from("revenues")
-        .insert([revenue])
-        .select(`
-          *,
-          property:properties(*),
-          category:categories(*)
-        `)
-        .single()
+      const { data, error } = await supabase.from("revenues").insert(revenue).select().single()
 
       if (error) throw error
       setRevenues((prev) => [data, ...prev])
-      return data
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
   const updateRevenue = async (id: string, updates: RevenueUpdate) => {
     try {
-      const { data, error } = await supabase
-        .from("revenues")
-        .update(updates)
-        .eq("id", id)
-        .select(`
-          *,
-          property:properties(*),
-          category:categories(*)
-        `)
-        .single()
+      const { data, error } = await supabase.from("revenues").update(updates).eq("id", id).select().single()
 
       if (error) throw error
       setRevenues((prev) => prev.map((rev) => (rev.id === id ? data : rev)))
-      return data
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -87,9 +59,10 @@ export function useRevenues() {
 
       if (error) throw error
       setRevenues((prev) => prev.filter((rev) => rev.id !== id))
+      return { error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { error }
     }
   }
 
@@ -101,7 +74,7 @@ export function useRevenues() {
     revenues,
     loading,
     error,
-    addRevenue,
+    createRevenue,
     updateRevenue,
     deleteRevenue,
     refetch: fetchRevenues,

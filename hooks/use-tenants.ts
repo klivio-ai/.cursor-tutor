@@ -16,28 +16,27 @@ export function useTenants() {
   const fetchTenants = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("tenants").select("*").order("name", { ascending: true })
+      const { data, error } = await supabase.from("tenants").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
       setTenants(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Error fetching tenants:", err)
     } finally {
       setLoading(false)
     }
   }
 
-  const addTenant = async (tenant: TenantInsert) => {
+  const createTenant = async (tenant: TenantInsert) => {
     try {
-      const { data, error } = await supabase.from("tenants").insert([tenant]).select().single()
+      const { data, error } = await supabase.from("tenants").insert(tenant).select().single()
 
       if (error) throw error
-      setTenants((prev) => [...prev, data])
-      return data
+      setTenants((prev) => [data, ...prev])
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -47,10 +46,10 @@ export function useTenants() {
 
       if (error) throw error
       setTenants((prev) => prev.map((tenant) => (tenant.id === id ? data : tenant)))
-      return data
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -60,9 +59,10 @@ export function useTenants() {
 
       if (error) throw error
       setTenants((prev) => prev.filter((tenant) => tenant.id !== id))
+      return { error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { error }
     }
   }
 
@@ -74,7 +74,7 @@ export function useTenants() {
     tenants,
     loading,
     error,
-    addTenant,
+    createTenant,
     updateTenant,
     deleteTenant,
     refetch: fetchTenants,

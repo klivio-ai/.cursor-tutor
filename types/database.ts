@@ -1,3 +1,5 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+
 export interface Database {
   public: {
     Tables: {
@@ -26,7 +28,6 @@ export interface Database {
           type?: string
           color?: string | null
           description?: string | null
-          created_at?: string | null
           updated_at?: string | null
         }
       }
@@ -79,7 +80,6 @@ export interface Database {
           due_date?: string | null
           date?: string
           file_url?: string | null
-          created_at?: string | null
           updated_at?: string | null
         }
       }
@@ -117,7 +117,6 @@ export interface Database {
           method?: string | null
           notes?: string | null
           user_id?: string | null
-          created_at?: string
           updated_at?: string
         }
       }
@@ -160,7 +159,6 @@ export interface Database {
           payment_status?: string
           next_due_date?: string | null
           user_id?: string | null
-          created_at?: string
           updated_at?: string
           rental_price?: number | null
         }
@@ -211,7 +209,6 @@ export interface Database {
           category_id?: string
           date?: string
           file_url?: string | null
-          created_at?: string | null
           updated_at?: string | null
         }
       }
@@ -240,7 +237,6 @@ export interface Database {
           email?: string | null
           phone_number?: string | null
           user_id?: string | null
-          created_at?: string
           updated_at?: string
         }
       }

@@ -67,25 +67,22 @@ export default async function DashboardPage() {
   }).reverse()
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your property management business</p>
       </div>
-      <div className="space-y-4">
-        <StatsCards
-          totalProperties={totalProperties}
-          totalTenants={totalTenants}
-          totalRevenue={totalRevenue}
-          totalExpenses={totalExpenses}
-        />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <div className="col-span-4">
-            <FinancialChart data={chartData} />
-          </div>
-          <div className="col-span-3">
-            <RecentTransactions transactions={transactions} />
-          </div>
-        </div>
+
+      <StatsCards
+        totalProperties={totalProperties}
+        totalTenants={totalTenants}
+        totalRevenue={totalRevenue}
+        totalExpenses={totalExpenses}
+      />
+
+      <div className="grid gap-8 md:grid-cols-2">
+        <FinancialChart data={chartData} />
+        <RecentTransactions transactions={transactions} />
       </div>
     </div>
   )

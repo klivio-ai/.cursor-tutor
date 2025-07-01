@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
-type Property = Database["public"]["Tables"]["properties"]["Row"] & {
-  tenant?: Database["public"]["Tables"]["tenants"]["Row"]
-}
+type Property = Database["public"]["Tables"]["properties"]["Row"]
 type PropertyInsert = Database["public"]["Tables"]["properties"]["Insert"]
 type PropertyUpdate = Database["public"]["Tables"]["properties"]["Update"]
 
@@ -18,34 +16,27 @@ export function useProperties() {
   const fetchProperties = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from("properties")
-        .select(`
-          *,
-          tenant:tenants(*)
-        `)
-        .order("created_at", { ascending: false })
+      const { data, error } = await supabase.from("properties").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
       setProperties(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Error fetching properties:", err)
     } finally {
       setLoading(false)
     }
   }
 
-  const addProperty = async (property: PropertyInsert) => {
+  const createProperty = async (property: PropertyInsert) => {
     try {
-      const { data, error } = await supabase.from("properties").insert([property]).select().single()
+      const { data, error } = await supabase.from("properties").insert(property).select().single()
 
       if (error) throw error
       setProperties((prev) => [data, ...prev])
-      return data
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -55,10 +46,10 @@ export function useProperties() {
 
       if (error) throw error
       setProperties((prev) => prev.map((prop) => (prop.id === id ? data : prop)))
-      return data
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -68,9 +59,10 @@ export function useProperties() {
 
       if (error) throw error
       setProperties((prev) => prev.filter((prop) => prop.id !== id))
+      return { error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { error }
     }
   }
 
@@ -82,7 +74,7 @@ export function useProperties() {
     properties,
     loading,
     error,
-    addProperty,
+    createProperty,
     updateProperty,
     deleteProperty,
     refetch: fetchProperties,

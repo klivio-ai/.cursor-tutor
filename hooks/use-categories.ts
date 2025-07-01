@@ -16,28 +16,27 @@ export function useCategories() {
   const fetchCategories = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("categories").select("*").order("name", { ascending: true })
+      const { data, error } = await supabase.from("categories").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
       setCategories(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Error fetching categories:", err)
     } finally {
       setLoading(false)
     }
   }
 
-  const addCategory = async (category: CategoryInsert) => {
+  const createCategory = async (category: CategoryInsert) => {
     try {
-      const { data, error } = await supabase.from("categories").insert([category]).select().single()
+      const { data, error } = await supabase.from("categories").insert(category).select().single()
 
       if (error) throw error
-      setCategories((prev) => [...prev, data])
-      return data
+      setCategories((prev) => [data, ...prev])
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -47,10 +46,10 @@ export function useCategories() {
 
       if (error) throw error
       setCategories((prev) => prev.map((cat) => (cat.id === id ? data : cat)))
-      return data
+      return { data, error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { data: null, error }
     }
   }
 
@@ -60,9 +59,10 @@ export function useCategories() {
 
       if (error) throw error
       setCategories((prev) => prev.filter((cat) => cat.id !== id))
+      return { error: null }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      throw err
+      const error = err instanceof Error ? err.message : "An error occurred"
+      return { error }
     }
   }
 
@@ -74,7 +74,7 @@ export function useCategories() {
     categories,
     loading,
     error,
-    addCategory,
+    createCategory,
     updateCategory,
     deleteCategory,
     refetch: fetchCategories,

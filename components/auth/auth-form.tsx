@@ -21,37 +21,37 @@ export function AuthForm() {
     e.preventDefault()
     setLoading(true)
 
-    try {
-      const { error } = await signIn(email, password)
-      if (error) throw error
+    const { error } = await signIn(email, password)
+
+    if (error) {
+      toast.error(error.message)
+    } else {
       toast.success("Signed in successfully!")
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred")
-    } finally {
-      setLoading(false)
     }
+
+    setLoading(false)
   }
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    try {
-      const { error } = await signUp(email, password)
-      if (error) throw error
-      toast.success("Account created successfully! Please check your email to verify your account.")
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred")
-    } finally {
-      setLoading(false)
+    const { error } = await signUp(email, password)
+
+    if (error) {
+      toast.error(error.message)
+    } else {
+      toast.success("Check your email to confirm your account!")
     }
+
+    setLoading(false)
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Property Management</CardTitle>
+          <CardTitle>Welcome</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>
         </CardHeader>
         <CardContent>
@@ -60,6 +60,7 @@ export function AuthForm() {
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
+
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
@@ -81,6 +82,7 @@ export function AuthForm() {
                 </Button>
               </form>
             </TabsContent>
+
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
