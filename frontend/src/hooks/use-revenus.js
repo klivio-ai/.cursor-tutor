@@ -11,13 +11,20 @@ export function useRevenus() {
   const fetchRevenus = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("revenus").select("*").order("date", { ascending: false })
+      const { data, error } = await supabase
+        .from("revenues")
+        .select(`
+          *,
+          property:properties(*),
+          category:categories(*)
+        `)
+        .order("date", { ascending: false })
 
       if (error) throw error
       setRevenus(data || [])
     } catch (err) {
       setError(err.message)
-      console.error("Error fetching revenus:", err)
+      console.error("Error fetching revenues:", err)
     } finally {
       setLoading(false)
     }
@@ -29,7 +36,7 @@ export function useRevenus() {
 
   const addRevenu = async (revenu) => {
     try {
-      const { data, error } = await supabase.from("revenus").insert([revenu]).select()
+      const { data, error } = await supabase.from("revenues").insert([revenu]).select()
 
       if (error) throw error
       setRevenus((prev) => [data[0], ...prev])

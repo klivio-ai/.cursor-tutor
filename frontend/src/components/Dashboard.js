@@ -1,222 +1,176 @@
-"use client"
-
-import { useState } from "react"
-import { Card } from "./ui/card"
-import { Loading } from "./ui/loading"
-import StatCard from "./dashboard/StatCard"
-import RecentTransactions from "./dashboard/RecentTransactions"
 import { useProperties } from "../hooks/use-properties"
 import { useRevenus } from "../hooks/use-revenus"
 import { useDepenses } from "../hooks/use-depenses"
+import { useCategories } from "../hooks/use-categories"
+import { StatCard } from "./dashboard/StatCard"
+import { RecentTransactions } from "./dashboard/RecentTransactions"
+import { CashflowChart } from "./charts/CashflowChart"
+import { ExpensesPieChart } from "./charts/ExpensesPieChart"
+import { PropertyPerfChart } from "./charts/PropertyPerfChart"
 
-const Dashboard = () => {
+function Dashboard() {
   const { properties, loading: propertiesLoading } = useProperties()
   const { revenus, loading: revenusLoading } = useRevenus()
   const { depenses, loading: depensesLoading } = useDepenses()
-  const [activeTab, setActiveTab] = useState("overview")
+  const { categories, loading: categoriesLoading } = useCategories()
 
-  const loading = propertiesLoading || revenusLoading || depensesLoading
+  const loading = propertiesLoading || revenusLoading || depensesLoading || categoriesLoading
 
-  // Calculate metrics
-  const totalProperties = properties?.length || 0
-  const totalRevenue = revenus?.reduce((sum, rev) => sum + (rev.montant || 0), 0) || 0
-  const totalExpenses = depenses?.reduce((sum, exp) => sum + (exp.montant || 0), 0) || 0
+  // Calculate totals
+  const totalRevenue = revenus.reduce((sum, rev) => sum + Number.parseFloat(rev.amount || 0), 0)
+  const totalExpenses = depenses.reduce((sum, exp) => sum + Number.parseFloat(exp.amount || 0), 0)
   const netIncome = totalRevenue - totalExpenses
+  const totalProperties = properties.length
 
-  // Get recent transactions
+  // Recent transactions (combine revenues and expenses)
   const recentTransactions = [
-    ...(revenus?.slice(0, 5).map((rev) => ({ ...rev, type: "revenue" })) || []),
-    ...(depenses?.slice(0, 5).map((exp) => ({ ...exp, type: "expense" })) || []),
+    ...revenus.map((rev) => ({
+      id: rev.id,
+      type: "revenue",
+      amount: Number.parseFloat(rev.amount || 0),
+      description: rev.description || "Revenu",
+      date: rev.date,
+      property: properties.find((p) => p.id === rev.property_id)?.name || "N/A",
+      category: categories.find((c) => c.id === rev.category_id)?.name || "N/A",
+      status: rev.status,
+      paid: rev.paid,
+    })),
+    ...depenses.map((exp) => ({
+      id: exp.id,
+      type: "expense",
+      amount: Number.parseFloat(exp.amount || 0),
+      description: exp.description || "Dépense",
+      date: exp.date,
+      property: properties.find((p) => p.id === exp.property_id)?.name || "N/A",
+      category: categories.find((c) => c.id === exp.category_id)?.name || "N/A",
+      status: exp.status,
+      paid: exp.paid,
+    })),
   ]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 10)
 
   if (loading) {
-    return <Loading />
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-64 mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">K</span>
-                </div>
-                <h1 className="text-xl font-bold text-slate-900">Klivio</h1>
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center">
+                <span className="text-white font-bold">🏠</span>
               </div>
+              <h1 className="text-2xl font-bold text-gray-900">Tableau de Bord Immobilier</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex space-x-1 bg-slate-100 rounded-lg p-1">
-                <button
-                  onClick={() => setActiveTab("overview")}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "overview"
-                      ? "bg-white text-slate-900 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Overview
-                </button>
-                <button
-                  onClick={() => setActiveTab("analytics")}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    activeTab === "analytics"
-                      ? "bg-white text-slate-900 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  Analytics
-                </button>
-              </div>
-            </div>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+              <span>+</span>
+              <span>Ajouter une Propriété</span>
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">Welcome back! 👋</h2>
-          <p className="text-slate-600">Here's what's happening with your properties today.</p>
-        </div>
-
+      <main className="max-w-7xl mx-auto p-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard title="Total Properties" value={totalProperties} change="+2.5%" trend="up" icon="🏠" color="blue" />
           <StatCard
-            title="Total Revenue"
-            value={`€${totalRevenue.toLocaleString()}`}
-            change="+12.3%"
-            trend="up"
-            icon="💰"
-            color="green"
+            title="Propriétés"
+            value={totalProperties.toString()}
+            icon="🏠"
+            trend={{ value: 0, isPositive: true }}
           />
           <StatCard
-            title="Total Expenses"
-            value={`€${totalExpenses.toLocaleString()}`}
-            change="-5.2%"
-            trend="down"
-            icon="📊"
-            color="red"
-          />
-          <StatCard
-            title="Net Income"
-            value={`€${netIncome.toLocaleString()}`}
-            change="+18.7%"
-            trend="up"
+            title="Revenus Totaux"
+            value={`${totalRevenue.toLocaleString("fr-FR")} €`}
             icon="📈"
-            color="purple"
+            trend={{ value: 12, isPositive: true }}
+          />
+          <StatCard
+            title="Dépenses Totales"
+            value={`${totalExpenses.toLocaleString("fr-FR")} €`}
+            icon="📉"
+            trend={{ value: 8, isPositive: false }}
+          />
+          <StatCard
+            title="Bénéfice Net"
+            value={`${netIncome.toLocaleString("fr-FR")} €`}
+            icon="💰"
+            trend={{ value: 15, isPositive: netIncome > 0 }}
           />
         </div>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4">Flux de Trésorerie</h3>
+            <CashflowChart revenus={revenus} expenses={depenses} />
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4">Répartition des Dépenses</h3>
+            <ExpensesPieChart expenses={depenses} categories={categories} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Performance by Property */}
+          <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4">Performance par Propriété</h3>
+            <PropertyPerfChart properties={properties} revenus={revenus} expenses={depenses} />
+          </div>
+
           {/* Recent Transactions */}
-          <div className="lg:col-span-2">
+          <div className="bg-white p-6 rounded-lg shadow">
             <RecentTransactions transactions={recentTransactions} />
           </div>
+        </div>
 
-          {/* Quick Actions */}
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-lg transition-all duration-200 group">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-sm">+</span>
-                    </div>
-                    <span className="font-medium text-slate-900">Add Property</span>
-                  </div>
-                  <svg
-                    className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 rounded-lg transition-all duration-200 group">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-sm">€</span>
-                    </div>
-                    <span className="font-medium text-slate-900">Add Revenue</span>
-                  </div>
-                  <svg
-                    className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                <button className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 rounded-lg transition-all duration-200 group">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-sm">-</span>
-                    </div>
-                    <span className="font-medium text-slate-900">Add Expense</span>
-                  </div>
-                  <svg
-                    className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </Card>
-
-            {/* Performance Summary */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">This Month</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Occupancy Rate</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div className="w-4/5 h-full bg-gradient-to-r from-green-500 to-green-600"></div>
-                    </div>
-                    <span className="text-sm font-medium text-slate-900">85%</span>
-                  </div>
+        {/* Properties Overview */}
+        <div className="mt-6 bg-white p-6 rounded-lg shadow">
+          <div className="flex items-center mb-4">
+            <span className="text-lg font-semibold">Aperçu des Propriétés</span>
+          </div>
+          <div className="space-y-4">
+            {properties.slice(0, 5).map((property) => (
+              <div key={property.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-sm">{property.name || "Sans nom"}</p>
+                  <p className="text-xs text-gray-500">{property.address}</p>
+                  <p className="text-xs text-gray-500 capitalize">{property.type || "N/A"}</p>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Collection Rate</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div className="w-11/12 h-full bg-gradient-to-r from-blue-500 to-blue-600"></div>
-                    </div>
-                    <span className="text-sm font-medium text-slate-900">92%</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-600">Maintenance</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div className="w-1/3 h-full bg-gradient-to-r from-yellow-500 to-yellow-600"></div>
-                    </div>
-                    <span className="text-sm font-medium text-slate-900">3 pending</span>
-                  </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">
+                    {Number.parseFloat(property.monthly_rent || 0).toLocaleString("fr-FR")} €/mois
+                  </p>
+                  <p className="text-xs text-gray-500 capitalize">{property.payment_status}</p>
+                  {property.next_due_date && (
+                    <p className="text-xs text-gray-500">
+                      Échéance: {new Date(property.next_due_date).toLocaleDateString("fr-FR")}
+                    </p>
+                  )}
                 </div>
               </div>
-            </Card>
+            ))}
+            {properties.length === 0 && <p className="text-center text-gray-500 py-4">Aucune propriété trouvée</p>}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

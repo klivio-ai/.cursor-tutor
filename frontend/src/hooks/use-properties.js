@@ -11,7 +11,13 @@ export function useProperties() {
   const fetchProperties = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("properties").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase
+        .from("properties")
+        .select(`
+          *,
+          tenant:tenants(*)
+        `)
+        .order("created_at", { ascending: false })
 
       if (error) throw error
       setProperties(data || [])

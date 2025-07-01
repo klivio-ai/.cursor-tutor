@@ -11,7 +11,7 @@ export function useCategories() {
   const fetchCategories = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("categories").select("*").order("nom", { ascending: true })
+      const { data, error } = await supabase.from("categories").select("*").order("name", { ascending: true })
 
       if (error) throw error
       setCategories(data || [])
@@ -27,10 +27,24 @@ export function useCategories() {
     fetchCategories()
   }, [])
 
+  const addCategory = async (category) => {
+    try {
+      const { data, error } = await supabase.from("categories").insert([category]).select()
+
+      if (error) throw error
+      setCategories((prev) => [...prev, data[0]])
+      return data[0]
+    } catch (err) {
+      setError(err.message)
+      throw err
+    }
+  }
+
   return {
     categories,
     loading,
     error,
-    fetchCategories,
+    addCategory,
+    refetch: fetchCategories,
   }
 }

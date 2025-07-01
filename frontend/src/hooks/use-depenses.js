@@ -11,13 +11,20 @@ export function useDepenses() {
   const fetchDepenses = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("depenses").select("*").order("date", { ascending: false })
+      const { data, error } = await supabase
+        .from("expenses")
+        .select(`
+          *,
+          property:properties(*),
+          category:categories(*)
+        `)
+        .order("date", { ascending: false })
 
       if (error) throw error
       setDepenses(data || [])
     } catch (err) {
       setError(err.message)
-      console.error("Error fetching depenses:", err)
+      console.error("Error fetching expenses:", err)
     } finally {
       setLoading(false)
     }
@@ -29,7 +36,7 @@ export function useDepenses() {
 
   const addDepense = async (depense) => {
     try {
-      const { data, error } = await supabase.from("depenses").insert([depense]).select()
+      const { data, error } = await supabase.from("expenses").insert([depense]).select()
 
       if (error) throw error
       setDepenses((prev) => [data[0], ...prev])
