@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ['@supabase/ssr'],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -7,10 +10,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    domains: ['placeholder.com'],
     unoptimized: true,
-  },
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
 }
 

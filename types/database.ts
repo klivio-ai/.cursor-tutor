@@ -8,7 +8,7 @@ export interface Database {
           id: string
           name: string
           type: "revenue" | "expense"
-          color: string
+          description: string | null
           created_at: string
           updated_at: string
         }
@@ -16,7 +16,7 @@ export interface Database {
           id?: string
           name: string
           type: "revenue" | "expense"
-          color?: string
+          description?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -24,7 +24,7 @@ export interface Database {
           id?: string
           name?: string
           type?: "revenue" | "expense"
-          color?: string
+          description?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -37,6 +37,8 @@ export interface Database {
           type: string
           purchase_price: number
           current_value: number
+          purchase_date: string
+          description: string | null
           created_at: string
           updated_at: string
         }
@@ -47,6 +49,8 @@ export interface Database {
           type: string
           purchase_price: number
           current_value: number
+          purchase_date: string
+          description?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -57,6 +61,8 @@ export interface Database {
           type?: string
           purchase_price?: number
           current_value?: number
+          purchase_date?: string
+          description?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -64,37 +70,43 @@ export interface Database {
       tenants: {
         Row: {
           id: string
+          property_id: string
           name: string
           email: string
-          phone: string
-          property_id: string
+          phone: string | null
           lease_start: string
           lease_end: string
-          rent_amount: number
+          monthly_rent: number
+          deposit: number
+          status: "active" | "inactive"
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
+          property_id: string
           name: string
           email: string
-          phone: string
-          property_id: string
+          phone?: string | null
           lease_start: string
           lease_end: string
-          rent_amount: number
+          monthly_rent: number
+          deposit: number
+          status?: "active" | "inactive"
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
+          property_id?: string
           name?: string
           email?: string
-          phone?: string
-          property_id?: string
+          phone?: string | null
           lease_start?: string
           lease_end?: string
-          rent_amount?: number
+          monthly_rent?: number
+          deposit?: number
+          status?: "active" | "inactive"
           created_at?: string
           updated_at?: string
         }
@@ -102,31 +114,37 @@ export interface Database {
       revenues: {
         Row: {
           id: string
-          description: string
-          amount: number
-          date: string
           property_id: string
           category_id: string
+          tenant_id: string | null
+          amount: number
+          date: string
+          description: string | null
+          payment_method: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          description: string
-          amount: number
-          date: string
           property_id: string
           category_id: string
+          tenant_id?: string | null
+          amount: number
+          date: string
+          description?: string | null
+          payment_method?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          description?: string
-          amount?: number
-          date?: string
           property_id?: string
           category_id?: string
+          tenant_id?: string | null
+          amount?: number
+          date?: string
+          description?: string | null
+          payment_method?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -134,34 +152,37 @@ export interface Database {
       expenses: {
         Row: {
           id: string
-          description: string
-          amount: number
-          date: string
           property_id: string
           category_id: string
-          vendor: string
+          amount: number
+          date: string
+          description: string | null
+          vendor: string | null
+          receipt_url: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          description: string
-          amount: number
-          date: string
           property_id: string
           category_id: string
-          vendor: string
+          amount: number
+          date: string
+          description?: string | null
+          vendor?: string | null
+          receipt_url?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          description?: string
-          amount?: number
-          date?: string
           property_id?: string
           category_id?: string
-          vendor?: string
+          amount?: number
+          date?: string
+          description?: string | null
+          vendor?: string | null
+          receipt_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -170,30 +191,39 @@ export interface Database {
         Row: {
           id: string
           tenant_id: string
+          property_id: string
           amount: number
-          date: string
-          method: string
-          status: "pending" | "completed" | "failed"
+          due_date: string
+          paid_date: string | null
+          status: "pending" | "paid" | "overdue"
+          payment_method: string | null
+          notes: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           tenant_id: string
+          property_id: string
           amount: number
-          date: string
-          method: string
-          status?: "pending" | "completed" | "failed"
+          due_date: string
+          paid_date?: string | null
+          status?: "pending" | "paid" | "overdue"
+          payment_method?: string | null
+          notes?: string | null
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           tenant_id?: string
+          property_id?: string
           amount?: number
-          date?: string
-          method?: string
-          status?: "pending" | "completed" | "failed"
+          due_date?: string
+          paid_date?: string | null
+          status?: "pending" | "paid" | "overdue"
+          payment_method?: string | null
+          notes?: string | null
           created_at?: string
           updated_at?: string
         }

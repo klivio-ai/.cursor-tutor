@@ -1,75 +1,85 @@
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create categories table
 CREATE TABLE IF NOT EXISTS categories (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL CHECK (type IN ('revenue', 'expense')),
-    color VARCHAR(7) DEFAULT '#3B82F6',
+    description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create properties table
 CREATE TABLE IF NOT EXISTS properties (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
     type VARCHAR(100) NOT NULL,
-    purchase_price DECIMAL(12,2) NOT NULL DEFAULT 0,
-    current_value DECIMAL(12,2) NOT NULL DEFAULT 0,
+    purchase_price DECIMAL(12,2) NOT NULL,
+    current_value DECIMAL(12,2) NOT NULL,
+    purchase_date DATE NOT NULL,
+    description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create tenants table
 CREATE TABLE IF NOT EXISTS tenants (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phone VARCHAR(50),
-    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,
     lease_start DATE NOT NULL,
     lease_end DATE NOT NULL,
-    rent_amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    monthly_rent DECIMAL(10,2) NOT NULL,
+    deposit DECIMAL(10,2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create revenues table
 CREATE TABLE IF NOT EXISTS revenues (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    description TEXT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+    category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    tenant_id UUID REFERENCES tenants(id) ON DELETE SET NULL,
+    amount DECIMAL(10,2) NOT NULL,
     date DATE NOT NULL,
-    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,
-    category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
+    description TEXT,
+    payment_method VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create expenses table
 CREATE TABLE IF NOT EXISTS expenses (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    description TEXT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+    category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    amount DECIMAL(10,2) NOT NULL,
     date DATE NOT NULL,
-    property_id UUID REFERENCES properties(id) ON DELETE CASCADE,
-    category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-    vendor VARCHAR(255) DEFAULT '',
+    description TEXT,
+    vendor VARCHAR(255),
+    receipt_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create payments table
 CREATE TABLE IF NOT EXISTS payments (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
-    amount DECIMAL(10,2) NOT NULL DEFAULT 0,
-    date DATE NOT NULL,
-    method VARCHAR(50) NOT NULL DEFAULT 'cash',
-    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+    amount DECIMAL(10,2) NOT NULL,
+    due_date DATE NOT NULL,
+    paid_date DATE,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'overdue')),
+    payment_method VARCHAR(100),
+    notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -77,14 +87,16 @@ CREATE TABLE IF NOT EXISTS payments (
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_properties_type ON properties(type);
 CREATE INDEX IF NOT EXISTS idx_tenants_property_id ON tenants(property_id);
+CREATE INDEX IF NOT EXISTS idx_tenants_status ON tenants(status);
 CREATE INDEX IF NOT EXISTS idx_revenues_property_id ON revenues(property_id);
 CREATE INDEX IF NOT EXISTS idx_revenues_date ON revenues(date);
 CREATE INDEX IF NOT EXISTS idx_expenses_property_id ON expenses(property_id);
 CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date);
 CREATE INDEX IF NOT EXISTS idx_payments_tenant_id ON payments(tenant_id);
-CREATE INDEX IF NOT EXISTS idx_payments_date ON payments(date);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+CREATE INDEX IF NOT EXISTS idx_payments_due_date ON payments(due_date);
 
--- Enable Row Level Security on all tables
+-- Enable Row Level Security
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
@@ -92,7 +104,7 @@ ALTER TABLE revenues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
--- Create policies for public access (you may want to restrict this based on user authentication)
+-- Create policies for public access (you may want to restrict these based on user authentication)
 CREATE POLICY "Allow public access to categories" ON categories FOR ALL USING (true);
 CREATE POLICY "Allow public access to properties" ON properties FOR ALL USING (true);
 CREATE POLICY "Allow public access to tenants" ON tenants FOR ALL USING (true);
