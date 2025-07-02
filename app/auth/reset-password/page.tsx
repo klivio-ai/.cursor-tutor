@@ -4,23 +4,23 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { toast } from "sonner"
-import { isValidPassword } from "@/lib/utils"
-import { Eye, EyeOff, AlertCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Eye, EyeOff, Lock, AlertCircle, CheckCircle } from "lucide-react"
+import { supabase } from "@/lib/supabase"
+import { validatePassword } from "@/lib/utils"
 
-export default function ResetPassword() {
+export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null)
   const [passwordError, setPasswordError] = useState("")
-  const [confirmPasswordError, setConfirmPasswordError] = useState("")
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -31,43 +31,55 @@ export default function ResetPassword() {
     const refreshToken = searchParams.get("refresh_token")
 
     if (!accessToken || !refreshToken) {
-      toast.error("Invalid reset link")
-      router.push("/auth")
+      setMessage({
+        type: "error",
+        text: "Invalid reset link. Please request a new password reset.",
+      })
     }
-  }, [searchParams, router])
+  }, [searchParams])
+
+  const validatePasswordInput = (password: string, confirmPassword: string) => {
+    if (!password) {
+      setPasswordError("Password is required")
+      return false
+    }
+
+    const validation = validatePassword(password)
+    if (!validation.isValid) {
+      setPasswordError(validation.errors[0])
+      return false
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match")
+      return false
+    }
+
+    setPasswordError("")
+    return true
+  }
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setPassword(value)
-
-    if (value && !isValidPassword(value)) {
-      setPasswordError("Password must be at least 6 characters long")
-    } else {
-      setPasswordError("")
+    if (value && confirmPassword) {
+      validatePasswordInput(value, confirmPassword)
     }
   }
 
   const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setConfirmPassword(value)
-
-    if (value && value !== password) {
-      setConfirmPasswordError("Passwords do not match")
-    } else {
-      setConfirmPasswordError("")
+    if (password && value) {
+      validatePasswordInput(password, value)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setMessage(null)
 
-    if (!isValidPassword(password)) {
-      setPasswordError("Password must be at least 6 characters long")
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match")
+    if (!validatePasswordInput(password, confirmPassword)) {
       return
     }
 
@@ -79,91 +91,114 @@ export default function ResetPassword() {
       })
 
       if (error) {
-        toast.error(error.message)
+        setMessage({ type: "error", text: error.message })
       } else {
-        toast.success("Password updated successfully!")
-        router.push("/")
+        setMessage({
+          type: "success",
+          text: "Password updated successfully! Redirecting to sign in...",
+        })
+
+        // Redirect to sign in after a short delay
+        setTimeout(() => {
+          router.push("/auth")
+        }, 2000)
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred")
+    } catch (error: any) {
+      setMessage({ type: "error", text: "An unexpected error occurred. Please try again." })
+      console.error("Reset password error:", error)
     } finally {
       setLoading(false)
     }
   }
 
+  const isFormValid = () => {
+    return password.length > 0 && confirmPassword.length > 0 && password === confirmPassword && !passwordError
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
-        <CardHeader>
+        <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
           <CardDescription className="text-center">Enter your new password below</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new-password">New Password</Label>
+              <Label htmlFor="password">New Password</Label>
               <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  id="new-password"
+                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter new password (min. 6 characters)"
+                  placeholder="Enter your new password"
                   value={password}
                   onChange={handlePasswordChange}
-                  className={passwordError ? "border-red-500 pr-10" : "pr-10"}
+                  className={`pl-10 pr-10 ${passwordError ? "border-red-500 focus:border-red-500" : ""}`}
                   required
                 />
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
+                </button>
               </div>
-              {passwordError && (
-                <div className="flex items-center gap-2 text-sm text-red-600">
-                  <AlertCircle className="h-4 w-4" />
-                  {passwordError}
-                </div>
-              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  id="confirm-new-password"
+                  id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm new password"
+                  placeholder="Confirm your new password"
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
-                  className={confirmPasswordError ? "border-red-500 pr-10" : "pr-10"}
+                  className="pl-10 pr-10"
                   required
                 />
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                 >
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
+                </button>
               </div>
-              {confirmPasswordError && (
-                <div className="flex items-center gap-2 text-sm text-red-600">
+              {passwordError && (
+                <div className="flex items-center space-x-1 text-sm text-red-600">
                   <AlertCircle className="h-4 w-4" />
-                  {confirmPasswordError}
+                  <span>{passwordError}</span>
                 </div>
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading || !!passwordError || !!confirmPasswordError}>
-              {loading ? "Updating password..." : "Update Password"}
+            {message && (
+              <Alert className={message.type === "error" ? "border-red-200 bg-red-50" : "border-green-200 bg-green-50"}>
+                {message.type === "error" ? (
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                )}
+                <AlertDescription className={message.type === "error" ? "text-red-700" : "text-green-700"}>
+                  {message.text}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <Button type="submit" className="w-full" disabled={loading || !isFormValid()}>
+              {loading ? "Updating..." : "Update Password"}
             </Button>
           </form>
+
+          <div className="mt-6 text-center">
+            <Button variant="link" onClick={() => router.push("/auth")}>
+              Back to Sign In
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
