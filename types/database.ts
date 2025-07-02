@@ -7,243 +7,225 @@ export interface Database {
         Row: {
           id: string
           name: string
-          type: string
-          color: string | null
-          description: string | null
-          created_at: string | null
-          updated_at: string | null
+          color: string
+          type: "revenue" | "expense"
+          created_at: string
+          updated_at: string
+          user_id: string
         }
         Insert: {
           id?: string
           name: string
-          type: string
-          color?: string | null
-          description?: string | null
-          created_at?: string | null
-          updated_at?: string | null
+          color: string
+          type: "revenue" | "expense"
+          created_at?: string
+          updated_at?: string
+          user_id: string
         }
         Update: {
           id?: string
           name?: string
-          type?: string
-          color?: string | null
-          description?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-      }
-      expenses: {
-        Row: {
-          id: string
-          reference: string | null
-          description: string
-          amount: number
-          vendor: string
-          status: string
-          paid: boolean | null
-          notes: string | null
-          property_id: string | null
-          category_id: string
-          due_date: string | null
-          date: string
-          file_url: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          reference?: string | null
-          description: string
-          amount: number
-          vendor: string
-          status: string
-          paid?: boolean | null
-          notes?: string | null
-          property_id?: string | null
-          category_id: string
-          due_date?: string | null
-          date: string
-          file_url?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          reference?: string | null
-          description?: string
-          amount?: number
-          vendor?: string
-          status?: string
-          paid?: boolean | null
-          notes?: string | null
-          property_id?: string | null
-          category_id?: string
-          due_date?: string | null
-          date?: string
-          file_url?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-      }
-      payments: {
-        Row: {
-          id: string
-          property_id: string
-          tenant_id: string | null
-          amount: number
-          payment_date: string
-          method: string | null
-          notes: string | null
-          user_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          property_id: string
-          tenant_id?: string | null
-          amount: number
-          payment_date: string
-          method?: string | null
-          notes?: string | null
-          user_id?: string | null
+          color?: string
+          type?: "revenue" | "expense"
           created_at?: string
           updated_at?: string
-        }
-        Update: {
-          id?: string
-          property_id?: string
-          tenant_id?: string | null
-          amount?: number
-          payment_date?: string
-          method?: string | null
-          notes?: string | null
-          user_id?: string | null
-          created_at?: string
-          updated_at?: string
+          user_id?: string
         }
       }
       properties: {
         Row: {
           id: string
-          name: string | null
+          name: string
           address: string
-          type: string | null
-          tenant_id: string | null
+          type: string
+          purchase_price: number
+          current_value: number
           monthly_rent: number
-          payment_status: string
-          next_due_date: string | null
-          user_id: string | null
           created_at: string
           updated_at: string
-          rental_price: number | null
+          user_id: string
         }
         Insert: {
           id?: string
-          name?: string | null
+          name: string
           address: string
-          type?: string | null
-          tenant_id?: string | null
+          type: string
+          purchase_price: number
+          current_value: number
           monthly_rent: number
-          payment_status?: string
-          next_due_date?: string | null
-          user_id?: string | null
           created_at?: string
           updated_at?: string
-          rental_price?: number | null
+          user_id: string
         }
         Update: {
           id?: string
-          name?: string | null
+          name?: string
           address?: string
-          type?: string | null
-          tenant_id?: string | null
+          type?: string
+          purchase_price?: number
+          current_value?: number
           monthly_rent?: number
-          payment_status?: string
-          next_due_date?: string | null
-          user_id?: string | null
           created_at?: string
           updated_at?: string
-          rental_price?: number | null
-        }
-      }
-      revenues: {
-        Row: {
-          id: string
-          reference: string | null
-          description: string
-          amount: number
-          source: string
-          status: string
-          paid: boolean | null
-          notes: string | null
-          property_id: string | null
-          category_id: string
-          date: string
-          file_url: string | null
-          created_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          id?: string
-          reference?: string | null
-          description: string
-          amount: number
-          source: string
-          status: string
-          paid?: boolean | null
-          notes?: string | null
-          property_id?: string | null
-          category_id: string
-          date: string
-          file_url?: string | null
-          created_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          id?: string
-          reference?: string | null
-          description?: string
-          amount?: number
-          source?: string
-          status?: string
-          paid?: boolean | null
-          notes?: string | null
-          property_id?: string | null
-          category_id?: string
-          date?: string
-          file_url?: string | null
-          created_at?: string | null
-          updated_at?: string | null
+          user_id?: string
         }
       }
       tenants: {
         Row: {
           id: string
           name: string
-          email: string | null
-          phone_number: string | null
-          user_id: string | null
+          email: string
+          phone: string
+          property_id: string
+          lease_start: string
+          lease_end: string
+          monthly_rent: number
+          deposit: number
           created_at: string
           updated_at: string
+          user_id: string
         }
         Insert: {
           id?: string
           name: string
-          email?: string | null
-          phone_number?: string | null
-          user_id?: string | null
+          email: string
+          phone: string
+          property_id: string
+          lease_start: string
+          lease_end: string
+          monthly_rent: number
+          deposit: number
           created_at?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
           id?: string
           name?: string
-          email?: string | null
-          phone_number?: string | null
-          user_id?: string | null
+          email?: string
+          phone?: string
+          property_id?: string
+          lease_start?: string
+          lease_end?: string
+          monthly_rent?: number
+          deposit?: number
           created_at?: string
           updated_at?: string
+          user_id?: string
+        }
+      }
+      revenues: {
+        Row: {
+          id: string
+          amount: number
+          description: string
+          date: string
+          category_id: string
+          property_id: string
+          tenant_id: string | null
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          amount: number
+          description: string
+          date: string
+          category_id: string
+          property_id: string
+          tenant_id?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          amount?: number
+          description?: string
+          date?: string
+          category_id?: string
+          property_id?: string
+          tenant_id?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+      }
+      expenses: {
+        Row: {
+          id: string
+          amount: number
+          description: string
+          date: string
+          category_id: string
+          property_id: string
+          vendor: string
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          amount: number
+          description: string
+          date: string
+          category_id: string
+          property_id: string
+          vendor: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          amount?: number
+          description?: string
+          date?: string
+          category_id?: string
+          property_id?: string
+          vendor?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+      }
+      payments: {
+        Row: {
+          id: string
+          amount: number
+          date: string
+          tenant_id: string
+          property_id: string
+          payment_method: string
+          status: "pending" | "completed" | "failed"
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          amount: number
+          date: string
+          tenant_id: string
+          property_id: string
+          payment_method: string
+          status: "pending" | "completed" | "failed"
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          amount?: number
+          date?: string
+          tenant_id?: string
+          property_id?: string
+          payment_method?: string
+          status?: "pending" | "completed" | "failed"
+          created_at?: string
+          updated_at?: string
+          user_id?: string
         }
       }
     }

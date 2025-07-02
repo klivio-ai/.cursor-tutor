@@ -30,24 +30,50 @@ export function useAuth() {
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { data, error }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      })
+      return { data, error }
+    } catch (error) {
+      return { data: null, error: { message: "An unexpected error occurred during sign in" } }
+    }
   }
 
   const signUp = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-    return { data, error }
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      return { data, error }
+    } catch (error) {
+      return { data: null, error: { message: "An unexpected error occurred during sign up" } }
+    }
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    return { error }
+    try {
+      const { error } = await supabase.auth.signOut()
+      return { error }
+    } catch (error) {
+      return { error: { message: "An unexpected error occurred during sign out" } }
+    }
+  }
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      })
+      return { data, error }
+    } catch (error) {
+      return { data: null, error: { message: "An unexpected error occurred during password reset" } }
+    }
   }
 
   return {
@@ -56,5 +82,6 @@ export function useAuth() {
     signIn,
     signUp,
     signOut,
+    resetPassword,
   }
 }
