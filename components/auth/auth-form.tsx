@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
+import { config } from "@/lib/config"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -57,7 +58,7 @@ export function AuthForm() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: config.auth.redirectUrl,
         },
       })
 
