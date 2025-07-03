@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useData } from "@/hooks/use-data"
+import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,12 +22,19 @@ export default function PropertiesPage() {
     properties, 
     tenants,
     loading, 
-    error 
+    error,
+    addProperty,
+    updateProperty,
+    deleteProperty
   } = useData()
+
+  const { toast } = useToast()
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedProperty, setSelectedProperty] = useState<any>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -57,10 +65,7 @@ export default function PropertiesPage() {
     )
   }
 
-  const handleAddProperty = () => {
-    // TODO: Implémenter l'ajout de propriété
-    console.log('Ajouter propriété:', formData)
-    setIsAddDialogOpen(false)
+  const resetForm = () => {
     setFormData({
       name: '',
       address: '',
@@ -74,6 +79,51 @@ export default function PropertiesPage() {
     })
   }
 
+  const handleAddProperty = async () => {
+    if (!formData.name || !formData.address || !formData.monthly_rent) {
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez remplir tous les champs obligatoires (nom, adresse, loyer mensuel).",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const propertyData = {
+        name: formData.name,
+        address: formData.address,
+        type: formData.type || null,
+        monthly_rent: parseFloat(formData.monthly_rent),
+        rental_price: formData.rental_price ? parseFloat(formData.rental_price) : null,
+        current_value: formData.current_value ? parseFloat(formData.current_value) : null,
+        tenant_id: formData.tenant_id === 'vacant' ? null : formData.tenant_id,
+        payment_status: formData.payment_status as 'Paid' | 'Pending' | 'Overdue',
+        next_due_date: formData.next_due_date || null,
+      }
+
+      await addProperty(propertyData)
+      
+      toast({
+        title: "Succès",
+        description: "Propriété ajoutée avec succès.",
+      })
+      
+      setIsAddDialogOpen(false)
+      resetForm()
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la propriété:', error)
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la propriété. Veuillez réessayer.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const handleEditProperty = (property: any) => {
     setSelectedProperty(property)
     setFormData({
@@ -83,23 +133,88 @@ export default function PropertiesPage() {
       monthly_rent: property.monthly_rent.toString(),
       rental_price: property.rental_price?.toString() || '',
       current_value: property.current_value?.toString() || '',
-      tenant_id: property.tenant_id || '',
+      tenant_id: property.tenant_id || 'vacant',
       payment_status: property.payment_status,
       next_due_date: property.next_due_date || ''
     })
     setIsEditDialogOpen(true)
   }
 
-  const handleUpdateProperty = () => {
-    // TODO: Implémenter la mise à jour de propriété
-    console.log('Mettre à jour propriété:', selectedProperty.id, formData)
-    setIsEditDialogOpen(false)
-    setSelectedProperty(null)
+  const handleUpdateProperty = async () => {
+    if (!formData.name || !formData.address || !formData.monthly_rent) {
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez remplir tous les champs obligatoires (nom, adresse, loyer mensuel).",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const propertyData = {
+        name: formData.name,
+        address: formData.address,
+        type: formData.type || null,
+        monthly_rent: parseFloat(formData.monthly_rent),
+        rental_price: formData.rental_price ? parseFloat(formData.rental_price) : null,
+        current_value: formData.current_value ? parseFloat(formData.current_value) : null,
+        tenant_id: formData.tenant_id === 'vacant' ? null : formData.tenant_id,
+        payment_status: formData.payment_status as 'Paid' | 'Pending' | 'Overdue',
+        next_due_date: formData.next_due_date || null,
+      }
+
+      await updateProperty(selectedProperty.id, propertyData)
+      
+      toast({
+        title: "Succès",
+        description: "Propriété mise à jour avec succès.",
+      })
+      
+      setIsEditDialogOpen(false)
+      setSelectedProperty(null)
+      resetForm()
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la propriété:', error)
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour la propriété. Veuillez réessayer.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const handleDeleteProperty = (propertyId: string) => {
-    // TODO: Implémenter la suppression de propriété
-    console.log('Supprimer propriété:', propertyId)
+  const handleDeleteProperty = (property: any) => {
+    setSelectedProperty(property)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDeleteProperty = async () => {
+    if (!selectedProperty) return
+
+    setIsSubmitting(true)
+    try {
+      await deleteProperty(selectedProperty.id)
+      
+      toast({
+        title: "Succès",
+        description: "Propriété supprimée avec succès.",
+      })
+      
+      setIsDeleteDialogOpen(false)
+      setSelectedProperty(null)
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la propriété:', error)
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la propriété. Veuillez réessayer.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const getPaymentStatusBadge = (status: string) => {
@@ -221,7 +336,7 @@ export default function PropertiesPage() {
                       <SelectValue placeholder="Sélectionner un locataire" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Vacant</SelectItem>
+                      <SelectItem value="vacant">Vacant</SelectItem>
                       {tenants.map((tenant) => (
                         <SelectItem key={tenant.id} value={tenant.id}>
                           {tenant.name}
@@ -254,11 +369,11 @@ export default function PropertiesPage() {
                 />
               </div>
               <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} disabled={isSubmitting}>
                   Annuler
                 </Button>
-                <Button onClick={handleAddProperty}>
-                  Ajouter
+                <Button onClick={handleAddProperty} disabled={isSubmitting}>
+                  {isSubmitting ? 'Ajout en cours...' : 'Ajouter'}
                 </Button>
               </div>
             </div>
@@ -278,80 +393,13 @@ export default function PropertiesPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <PropertiesMap properties={properties} />
-        </CardContent>
-      </Card>
-
-      {/* Properties Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-lg">
-            <Building2 className="h-5 w-5 mr-2 text-purple-600" />
-            Liste des Propriétés
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Propriété</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Adresse</TableHead>
-                  <TableHead>Loyer</TableHead>
-                  <TableHead>Valeur</TableHead>
-                  <TableHead>Locataire</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {properties.map((property) => (
-                  <TableRow key={property.id}>
-                    <TableCell className="font-medium">{property.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{getPropertyTypeLabel(property.type || '')}</Badge>
-                    </TableCell>
-                    <TableCell className="max-w-[200px] truncate">{property.address}</TableCell>
-                    <TableCell>{property.monthly_rent.toLocaleString('fr-FR')} €</TableCell>
-                    <TableCell>{property.current_value?.toLocaleString('fr-FR') || '-'} €</TableCell>
-                    <TableCell>{getTenantName(property.tenant_id || '')}</TableCell>
-                    <TableCell>{getPaymentStatusBadge(property.payment_status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleEditProperty(property)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleDeleteProperty(property.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {properties.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
-                      <Building2 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <h3 className="text-sm font-medium text-gray-900 mb-2">Aucune propriété</h3>
-                      <p className="text-sm text-gray-500">Commencez par ajouter votre première propriété.</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <PropertiesMap
+            properties={properties}
+            tenants={tenants}
+            onEdit={handleEditProperty}
+            onDelete={handleDeleteProperty}
+            getTenantName={getTenantName}
+          />
         </CardContent>
       </Card>
 
@@ -436,7 +484,7 @@ export default function PropertiesPage() {
                     <SelectValue placeholder="Sélectionner un locataire" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Vacant</SelectItem>
+                    <SelectItem value="vacant">Vacant</SelectItem>
                     {tenants.map((tenant) => (
                       <SelectItem key={tenant.id} value={tenant.id}>
                         {tenant.name}
@@ -469,11 +517,31 @@ export default function PropertiesPage() {
               />
             </div>
             <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} disabled={isSubmitting}>
                 Annuler
               </Button>
-              <Button onClick={handleUpdateProperty}>
-                Mettre à jour
+              <Button onClick={handleUpdateProperty} disabled={isSubmitting}>
+                {isSubmitting ? 'Mise à jour...' : 'Mettre à jour'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Supprimer la propriété</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>Êtes-vous sûr de vouloir supprimer cette propriété ?</p>
+            <div className="flex justify-end gap-3 pt-4">
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isSubmitting}>
+                Annuler
+              </Button>
+              <Button onClick={confirmDeleteProperty} disabled={isSubmitting} variant="destructive">
+                {isSubmitting ? 'Suppression...' : 'Supprimer'}
               </Button>
             </div>
           </div>

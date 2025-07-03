@@ -5,9 +5,13 @@ import { MapPin, Building2 } from "lucide-react"
 
 interface PropertiesMapProps {
   properties: any[]
+  tenants?: any[]
+  onEdit?: (property: any) => void
+  onDelete?: (property: any) => void
+  getTenantName?: (tenantId: string) => string
 }
 
-export function PropertiesMap({ properties }: PropertiesMapProps) {
+export function PropertiesMap({ properties, onEdit, onDelete, getTenantName }: PropertiesMapProps) {
   if (properties.length === 0) {
     return (
       <div className="text-center py-8">
@@ -51,6 +55,29 @@ export function PropertiesMap({ properties }: PropertiesMapProps) {
                     <span className="text-xs text-gray-600">
                       {property.current_value?.toLocaleString('fr-FR') || '-'} €
                     </span>
+                  </div>
+                  <div className="text-xs text-gray-700 mt-2">
+                    Locataire : {getTenantName ? getTenantName(property.tenant_id || '') : 'Vacant'}
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    {onEdit && (
+                      <button
+                        className="p-1 rounded hover:bg-gray-100"
+                        title="Modifier"
+                        onClick={() => onEdit(property)}
+                      >
+                        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-edit"><path d="M11 4L13 6L6 13H4V11L11 4Z"></path></svg>
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        className="p-1 rounded hover:bg-gray-100"
+                        title="Supprimer"
+                        onClick={() => onDelete(property)}
+                      >
+                        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><circle cx="6" cy="6" r="1"></circle><circle cx="12" cy="6" r="1"></circle><path d="M3 6V19A2 2 0 0 0 5 21H19A2 2 0 0 0 21 19V6"></path><path d="M8 6V4A2 2 0 0 1 10 2H14A2 2 0 0 1 16 4V6"></path></svg>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
