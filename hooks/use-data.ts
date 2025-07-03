@@ -27,12 +27,18 @@ interface UseDataReturn extends DataState {
   addProperty: (property: Omit<Property, "id" | "created_at" | "updated_at">) => Promise<Property>
   addRevenue: (revenue: Omit<Revenue, "id" | "created_at" | "updated_at">) => Promise<Revenue>
   addExpense: (expense: Omit<Expense, "id" | "created_at" | "updated_at">) => Promise<Expense>
+  addTenant: (tenant: Omit<Tenant, "id" | "created_at" | "updated_at">) => Promise<Tenant>
+  addPayment: (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => Promise<Payment>
   updateProperty: (id: string, updates: Partial<Property>) => Promise<Property>
   updateRevenue: (id: string, updates: Partial<Revenue>) => Promise<Revenue>
   updateExpense: (id: string, updates: Partial<Expense>) => Promise<Expense>
+  updateTenant: (id: string, updates: Partial<Tenant>) => Promise<Tenant>
+  updatePayment: (id: string, updates: Partial<Payment>) => Promise<Payment>
   deleteProperty: (id: string) => Promise<void>
   deleteRevenue: (id: string) => Promise<void>
   deleteExpense: (id: string) => Promise<void>
+  deleteTenant: (id: string) => Promise<void>
+  deletePayment: (id: string) => Promise<void>
 }
 
 export function useData(): UseDataReturn {
@@ -237,17 +243,97 @@ export function useData(): UseDataReturn {
     }))
   }
 
+  const addTenant = async (tenant: Omit<Tenant, "id" | "created_at" | "updated_at">) => {
+    const { data, error } = await supabase
+      .from("tenants")
+      .insert([tenant])
+      .select()
+      .single()
+
+    if (error) throw error
+    setState((prev: DataState) => ({ ...prev, tenants: [data, ...prev.tenants] }))
+    return data
+  }
+
+  const updateTenant = async (id: string, updates: Partial<Tenant>) => {
+    const { data, error } = await supabase
+      .from("tenants")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) throw error
+    setState((prev: DataState) => ({
+      ...prev,
+      tenants: prev.tenants.map((t: Tenant) => t.id === id ? data : t)
+    }))
+    return data
+  }
+
+  const deleteTenant = async (id: string) => {
+    const { error } = await supabase.from("tenants").delete().eq("id", id)
+    if (error) throw error
+    setState((prev: DataState) => ({
+      ...prev,
+      tenants: prev.tenants.filter((t: Tenant) => t.id !== id)
+    }))
+  }
+
+  const addPayment = async (payment: Omit<Payment, "id" | "created_at" | "updated_at">) => {
+    const { data, error } = await supabase
+      .from("payments")
+      .insert([payment])
+      .select()
+      .single()
+
+    if (error) throw error
+    setState((prev: DataState) => ({ ...prev, payments: [data, ...prev.payments] }))
+    return data
+  }
+
+  const updatePayment = async (id: string, updates: Partial<Payment>) => {
+    const { data, error } = await supabase
+      .from("payments")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) throw error
+    setState((prev: DataState) => ({
+      ...prev,
+      payments: prev.payments.map((p: Payment) => p.id === id ? data : p)
+    }))
+    return data
+  }
+
+  const deletePayment = async (id: string) => {
+    const { error } = await supabase.from("payments").delete().eq("id", id)
+    if (error) throw error
+    setState((prev: DataState) => ({
+      ...prev,
+      payments: prev.payments.filter((p: Payment) => p.id !== id)
+    }))
+  }
+
   return {
     ...state,
     refetch: fetchAllData,
     addProperty,
     addRevenue,
     addExpense,
+    addTenant,
+    addPayment,
     updateProperty,
     updateRevenue,
     updateExpense,
+    updateTenant,
+    updatePayment,
     deleteProperty,
     deleteRevenue,
     deleteExpense,
+    deleteTenant,
+    deletePayment,
   }
 } 
