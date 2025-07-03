@@ -7,17 +7,28 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Home, Building2, Users, TrendingUp, TrendingDown, CreditCard, Settings, Menu, LogOut } from "lucide-react"
+import { 
+  Home, 
+  Building2, 
+  Users, 
+  TrendingUp, 
+  TrendingDown, 
+  CreditCard, 
+  Settings, 
+  Menu, 
+  LogOut,
+  ChevronRight
+} from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
-  { name: "Properties", href: "/properties", icon: Building2 },
-  { name: "Tenants", href: "/tenants", icon: Users },
-  { name: "Revenue", href: "/revenue", icon: TrendingUp },
-  { name: "Expenses", href: "/expenses", icon: TrendingDown },
-  { name: "Payments", href: "/payments", icon: CreditCard },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Tableau de Bord", href: "/", icon: Home },
+  { name: "Propriétés", href: "/properties", icon: Building2 },
+  { name: "Locataires", href: "/tenants", icon: Users },
+  { name: "Revenus", href: "/revenue", icon: TrendingUp },
+  { name: "Dépenses", href: "/expenses", icon: TrendingDown },
+  { name: "Paiements", href: "/payments", icon: CreditCard },
+  { name: "Paramètres", href: "/settings", icon: Settings },
 ]
 
 interface SidebarProps {
@@ -29,31 +40,61 @@ export function Sidebar({ className }: SidebarProps) {
   const { signOut } = useAuth()
 
   return (
-    <div className={cn("pb-12", className)}>
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">Property Finance</h2>
-          <div className="space-y-1">
-            {navigation.map((item) => (
-              <Button
-                key={item.name}
-                variant={pathname === item.href ? "secondary" : "ghost"}
-                className="w-full justify-start"
-                asChild
-              >
-                <Link href={item.href}>
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.name}
-                </Link>
-              </Button>
-            ))}
+    <div className={cn("flex flex-col h-full", className)}>
+      {/* Logo/Brand */}
+      <div className="flex h-16 shrink-0 items-center px-6 border-b">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">Property Finance</h1>
+            <p className="text-xs text-gray-500">Dashboard</p>
           </div>
         </div>
       </div>
-      <div className="absolute bottom-4 left-4 right-4">
-        <Button variant="outline" className="w-full justify-start bg-transparent" onClick={signOut}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1 px-3 py-4">
+        <nav className="space-y-1">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors",
+                  isActive
+                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                )}
+              >
+                <item.icon 
+                  className={cn(
+                    "mr-3 h-5 w-5 flex-shrink-0",
+                    isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-500"
+                  )} 
+                />
+                <span className="flex-1">{item.name}</span>
+                {isActive && (
+                  <ChevronRight className="h-4 w-4 text-blue-600" />
+                )}
+              </Link>
+            )
+          })}
+        </nav>
+      </ScrollArea>
+
+      {/* User Section */}
+      <div className="border-t bg-gray-50 p-4">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+          onClick={signOut}
+        >
+          <LogOut className="mr-3 h-5 w-5" />
+          Se déconnecter
         </Button>
       </div>
     </div>
@@ -68,16 +109,14 @@ export function MobileSidebar() {
       <SheetTrigger asChild>
         <Button
           variant="ghost"
-          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden"
         >
           <Menu className="h-6 w-6" />
-          <span className="sr-only">Toggle Menu</span>
+          <span className="sr-only">Ouvrir le menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="pr-0">
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-          <Sidebar />
-        </ScrollArea>
+      <SheetContent side="left" className="p-0 w-80">
+        <Sidebar />
       </SheetContent>
     </Sheet>
   )

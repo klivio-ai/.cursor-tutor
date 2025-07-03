@@ -1,14 +1,17 @@
 import { Suspense } from 'react'
-import Dashboard from '@/components/Dashboard'
+import ExpensesPage from '@/components/expenses/ExpensesPage'
 import { Loading } from '@/components/ui/loading'
+import { MainLayout } from '@/components/layout/main-layout'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
 
-export default function ExpensesPage() {
+export default function ExpensesPageWrapper() {
   return (
-    <Suspense fallback={<Loading />}>
-      <Dashboard />
-    </Suspense>
+    <MainLayout>
+      <Suspense fallback={<Loading />}>
+        <ExpensesPage />
+      </Suspense>
+    </MainLayout>
   )
 } 

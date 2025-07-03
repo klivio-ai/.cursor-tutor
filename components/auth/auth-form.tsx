@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, Building2, Mail, Lock } from "lucide-react"
 
 export function AuthForm() {
   const [email, setEmail] = useState("")
@@ -36,17 +36,17 @@ export function AuthForm() {
     e.preventDefault()
 
     if (!validateEmail(email)) {
-      setMessage({ type: "error", text: "Please enter a valid email address" })
+      setMessage({ type: "error", text: "Veuillez entrer une adresse email valide" })
       return
     }
 
     if (!validatePassword(password)) {
-      setMessage({ type: "error", text: "Password must be at least 6 characters long" })
+      setMessage({ type: "error", text: "Le mot de passe doit contenir au moins 6 caractères" })
       return
     }
 
     if (password !== confirmPassword) {
-      setMessage({ type: "error", text: "Passwords do not match" })
+      setMessage({ type: "error", text: "Les mots de passe ne correspondent pas" })
       return
     }
 
@@ -66,12 +66,12 @@ export function AuthForm() {
 
       setMessage({
         type: "success",
-        text: "Check your email for the confirmation link!",
+        text: "Vérifiez votre email pour le lien de confirmation !",
       })
     } catch (error) {
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "An error occurred during sign up",
+        text: error instanceof Error ? error.message : "Une erreur s'est produite lors de l'inscription",
       })
     } finally {
       setLoading(false)
@@ -82,12 +82,12 @@ export function AuthForm() {
     e.preventDefault()
 
     if (!validateEmail(email)) {
-      setMessage({ type: "error", text: "Please enter a valid email address" })
+      setMessage({ type: "error", text: "Veuillez entrer une adresse email valide" })
       return
     }
 
     if (!validatePassword(password)) {
-      setMessage({ type: "error", text: "Password must be at least 6 characters long" })
+      setMessage({ type: "error", text: "Le mot de passe doit contenir au moins 6 caractères" })
       return
     }
 
@@ -104,7 +104,7 @@ export function AuthForm() {
     } catch (error) {
       setMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "An error occurred during sign in",
+        text: error instanceof Error ? error.message : "Une erreur s'est produite lors de la connexion",
       })
     } finally {
       setLoading(false)
@@ -112,41 +112,54 @@ export function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Property Finance Dashboard</CardTitle>
-          <CardDescription className="text-center">Sign in to your account or create a new one</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
+            <Building2 className="w-6 h-6 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-900">Property Finance Dashboard</CardTitle>
+          <CardDescription className="text-gray-600">Connectez-vous à votre compte ou créez-en un nouveau</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100">
+              <TabsTrigger value="signin" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Connexion
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                Inscription
+              </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
+            <TabsContent value="signin" className="space-y-4 mt-6">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="signin-email" className="text-sm font-medium text-gray-700">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="Entrez votre email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password" className="text-sm font-medium text-gray-700">Mot de passe</Label>
                   <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="signin-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="Entrez votre mot de passe"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10"
                       required
                     />
                     <Button
@@ -160,35 +173,41 @@ export function AuthForm() {
                     </Button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign In
+                  Se connecter
                 </Button>
               </form>
             </TabsContent>
 
-            <TabsContent value="signup">
+            <TabsContent value="signup" className="space-y-4 mt-6">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+                  <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="Entrez votre email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">Mot de passe</Label>
                   <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="signup-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder="Entrez votre mot de passe"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10"
                       required
                     />
                     <Button
@@ -203,14 +222,16 @@ export function AuthForm() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password" className="text-sm font-medium text-gray-700">Confirmer le mot de passe</Label>
                   <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
                       id="confirm-password"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      placeholder="Confirmez votre mot de passe"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="pl-10 pr-10"
                       required
                     />
                     <Button
@@ -224,9 +245,9 @@ export function AuthForm() {
                     </Button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Sign Up
+                  S'inscrire
                 </Button>
               </form>
             </TabsContent>
@@ -234,11 +255,13 @@ export function AuthForm() {
 
           {message && (
             <Alert
-              className={`mt-4 ${message.type === "error" ? "border-red-200 bg-red-50" : "border-green-200 bg-green-50"}`}
+              className={`mt-6 ${
+                message.type === "error" 
+                  ? "border-red-200 bg-red-50 text-red-800" 
+                  : "border-green-200 bg-green-50 text-green-800"
+              }`}
             >
-              <AlertDescription className={message.type === "error" ? "text-red-800" : "text-green-800"}>
-                {message.text}
-              </AlertDescription>
+              <AlertDescription>{message.text}</AlertDescription>
             </Alert>
           )}
         </CardContent>

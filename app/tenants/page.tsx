@@ -1,14 +1,17 @@
 import { Suspense } from 'react'
-import Dashboard from '@/components/Dashboard'
+import TenantsPage from '@/components/tenants/TenantsPage'
 import { Loading } from '@/components/ui/loading'
+import { MainLayout } from '@/components/layout/main-layout'
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
 
-export default function TenantsPage() {
+export default function TenantsPageWrapper() {
   return (
-    <Suspense fallback={<Loading />}>
-      <Dashboard />
-    </Suspense>
+    <MainLayout>
+      <Suspense fallback={<Loading />}>
+        <TenantsPage />
+      </Suspense>
+    </MainLayout>
   )
 } 
