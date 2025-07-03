@@ -3,6 +3,32 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       categories: {
         Row: {
           id: string
@@ -46,6 +72,7 @@ export interface Database {
           created_at: string
           updated_at: string
           rental_price: number | null
+          current_value: number | null
         }
         Insert: {
           id?: string
@@ -60,6 +87,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
           rental_price?: number | null
+          current_value?: number | null
         }
         Update: {
           id?: string
@@ -74,6 +102,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
           rental_price?: number | null
+          current_value?: number | null
         }
       }
       tenants: {
@@ -121,6 +150,7 @@ export interface Database {
           file_url: string | null
           created_at: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           id?: string
@@ -137,6 +167,7 @@ export interface Database {
           file_url?: string | null
           created_at?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           id?: string
@@ -153,6 +184,7 @@ export interface Database {
           file_url?: string | null
           created_at?: string
           updated_at?: string
+          user_id?: string | null
         }
       }
       expenses: {
@@ -172,6 +204,7 @@ export interface Database {
           file_url: string | null
           created_at: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           id?: string
@@ -189,6 +222,7 @@ export interface Database {
           file_url?: string | null
           created_at?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           id?: string
@@ -206,6 +240,7 @@ export interface Database {
           file_url?: string | null
           created_at?: string
           updated_at?: string
+          user_id?: string | null
         }
       }
       payments: {

@@ -6,8 +6,14 @@ import { formatCurrency, formatDate } from "@/lib/utils"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import type { Database } from "@/types/database"
 
-type Revenue = Database["public"]["Tables"]["revenues"]["Row"]
-type Expense = Database["public"]["Tables"]["expenses"]["Row"]
+type Revenue = Database["public"]["Tables"]["revenues"]["Row"] & {
+  properties?: { name: string | null }
+  categories?: { name: string }
+}
+type Expense = Database["public"]["Tables"]["expenses"]["Row"] & {
+  properties?: { name: string | null }
+  categories?: { name: string }
+}
 
 interface RecentTransactionsProps {
   revenues: Revenue[]
@@ -23,7 +29,7 @@ export function RecentTransactions({ revenues, expenses }: RecentTransactionsPro
       amount: revenue.amount,
       date: revenue.date,
       description: revenue.description || "Revenue",
-      category: (revenue as any).categories?.name || "Unknown",
+      category: revenue.categories?.name || "Unknown",
     })),
     ...expenses.slice(0, 5).map((expense) => ({
       id: expense.id,
@@ -31,7 +37,7 @@ export function RecentTransactions({ revenues, expenses }: RecentTransactionsPro
       amount: expense.amount,
       date: expense.date,
       description: expense.description || "Expense",
-      category: (expense as any).categories?.name || "Unknown",
+      category: expense.categories?.name || "Unknown",
     })),
   ]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())

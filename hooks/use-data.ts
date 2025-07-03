@@ -56,31 +56,64 @@ export function useData(): UseDataReturn {
   const fetchAllData = async () => {
     try {
       setState((prev: DataState) => ({ ...prev, loading: true, error: null }))
+      
+      console.log("Début de la récupération des données...")
 
-      const [
-        { data: properties, error: propertiesError },
-        { data: revenues, error: revenuesError },
-        { data: expenses, error: expensesError },
-        { data: tenants, error: tenantsError },
-        { data: categories, error: categoriesError },
-        { data: payments, error: paymentsError },
-      ] = await Promise.all([
-        supabase.from("properties").select("*").order("created_at", { ascending: false }),
-        supabase.from("revenues").select(`
-          *,
-          properties(name),
-          categories(name),
-          tenants(name)
-        `).order("date", { ascending: false }),
-        supabase.from("expenses").select(`
+      // Récupération des propriétés
+      const { data: properties, error: propertiesError } = await supabase
+        .from("properties")
+        .select("*")
+        .order("created_at", { ascending: false })
+      
+      console.log("Propriétés récupérées:", properties?.length || 0, "erreur:", propertiesError)
+
+      // Récupération des revenus
+      const { data: revenues, error: revenuesError } = await supabase
+        .from("revenues")
+        .select(`
           *,
           properties(name),
           categories(name)
-        `).order("date", { ascending: false }),
-        supabase.from("tenants").select("*").order("created_at", { ascending: false }),
-        supabase.from("categories").select("*").order("name"),
-        supabase.from("payments").select("*").order("due_date", { ascending: false }),
-      ])
+        `)
+        .order("date", { ascending: false })
+      
+      console.log("Revenus récupérés:", revenues?.length || 0, "erreur:", revenuesError)
+
+      // Récupération des dépenses
+      const { data: expenses, error: expensesError } = await supabase
+        .from("expenses")
+        .select(`
+          *,
+          properties(name),
+          categories(name)
+        `)
+        .order("date", { ascending: false })
+      
+      console.log("Dépenses récupérées:", expenses?.length || 0, "erreur:", expensesError)
+
+      // Récupération des locataires
+      const { data: tenants, error: tenantsError } = await supabase
+        .from("tenants")
+        .select("*")
+        .order("created_at", { ascending: false })
+      
+      console.log("Locataires récupérés:", tenants?.length || 0, "erreur:", tenantsError)
+
+      // Récupération des catégories
+      const { data: categories, error: categoriesError } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name")
+      
+      console.log("Catégories récupérées:", categories?.length || 0, "erreur:", categoriesError)
+
+      // Récupération des paiements
+      const { data: payments, error: paymentsError } = await supabase
+        .from("payments")
+        .select("*")
+        .order("payment_date", { ascending: false })
+      
+      console.log("Paiements récupérés:", payments?.length || 0, "erreur:", paymentsError)
 
       if (propertiesError) throw propertiesError
       if (revenuesError) throw revenuesError
@@ -100,11 +133,21 @@ export function useData(): UseDataReturn {
         error: null,
       })
     } catch (error) {
-      console.error("Error fetching data:", error)
+      console.error("Erreur lors de la récupération des données:", error)
+      
+      let errorMessage = "Une erreur est survenue"
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = String(error.message)
+      }
+      
       setState((prev: DataState) => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : "Une erreur est survenue",
+        error: errorMessage,
       }))
     }
   }
@@ -133,8 +176,7 @@ export function useData(): UseDataReturn {
       .select(`
         *,
         properties(name),
-        categories(name),
-        tenants(name)
+        categories(name)
       `)
       .single()
 
@@ -162,7 +204,7 @@ export function useData(): UseDataReturn {
   const updateProperty = async (id: string, updates: Partial<Property>) => {
     const { data, error } = await supabase
       .from("properties")
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq("id", id)
       .select()
       .single()
@@ -170,7 +212,7 @@ export function useData(): UseDataReturn {
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      properties: prev.properties.map((p: Property) => p.id === id ? data : p)
+      properties: prev.properties.map(prop => prop.id === id ? data : prop)
     }))
     return data
   }
@@ -178,28 +220,7 @@ export function useData(): UseDataReturn {
   const updateRevenue = async (id: string, updates: Partial<Revenue>) => {
     const { data, error } = await supabase
       .from("revenues")
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq("id", id)
-      .select(`
-        *,
-        properties(name),
-        categories(name),
-        tenants(name)
-      `)
-      .single()
-
-    if (error) throw error
-    setState((prev: DataState) => ({
-      ...prev,
-      revenues: prev.revenues.map((r: Revenue) => r.id === id ? data : r)
-    }))
-    return data
-  }
-
-  const updateExpense = async (id: string, updates: Partial<Expense>) => {
-    const { data, error } = await supabase
-      .from("expenses")
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq("id", id)
       .select(`
         *,
@@ -211,35 +232,67 @@ export function useData(): UseDataReturn {
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      expenses: prev.expenses.map((e: Expense) => e.id === id ? data : e)
+      revenues: prev.revenues.map(rev => rev.id === id ? data : rev)
+    }))
+    return data
+  }
+
+  const updateExpense = async (id: string, updates: Partial<Expense>) => {
+    const { data, error } = await supabase
+      .from("expenses")
+      .update(updates)
+      .eq("id", id)
+      .select(`
+        *,
+        properties(name),
+        categories(name)
+      `)
+      .single()
+
+    if (error) throw error
+    setState((prev: DataState) => ({
+      ...prev,
+      expenses: prev.expenses.map(exp => exp.id === id ? data : exp)
     }))
     return data
   }
 
   const deleteProperty = async (id: string) => {
-    const { error } = await supabase.from("properties").delete().eq("id", id)
+    const { error } = await supabase
+      .from("properties")
+      .delete()
+      .eq("id", id)
+
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      properties: prev.properties.filter((p: Property) => p.id !== id)
+      properties: prev.properties.filter(prop => prop.id !== id)
     }))
   }
 
   const deleteRevenue = async (id: string) => {
-    const { error } = await supabase.from("revenues").delete().eq("id", id)
+    const { error } = await supabase
+      .from("revenues")
+      .delete()
+      .eq("id", id)
+
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      revenues: prev.revenues.filter((r: Revenue) => r.id !== id)
+      revenues: prev.revenues.filter(rev => rev.id !== id)
     }))
   }
 
   const deleteExpense = async (id: string) => {
-    const { error } = await supabase.from("expenses").delete().eq("id", id)
+    const { error } = await supabase
+      .from("expenses")
+      .delete()
+      .eq("id", id)
+
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      expenses: prev.expenses.filter((e: Expense) => e.id !== id)
+      expenses: prev.expenses.filter(exp => exp.id !== id)
     }))
   }
 
@@ -258,7 +311,7 @@ export function useData(): UseDataReturn {
   const updateTenant = async (id: string, updates: Partial<Tenant>) => {
     const { data, error } = await supabase
       .from("tenants")
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq("id", id)
       .select()
       .single()
@@ -266,17 +319,21 @@ export function useData(): UseDataReturn {
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      tenants: prev.tenants.map((t: Tenant) => t.id === id ? data : t)
+      tenants: prev.tenants.map(tenant => tenant.id === id ? data : tenant)
     }))
     return data
   }
 
   const deleteTenant = async (id: string) => {
-    const { error } = await supabase.from("tenants").delete().eq("id", id)
+    const { error } = await supabase
+      .from("tenants")
+      .delete()
+      .eq("id", id)
+
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      tenants: prev.tenants.filter((t: Tenant) => t.id !== id)
+      tenants: prev.tenants.filter(tenant => tenant.id !== id)
     }))
   }
 
@@ -295,7 +352,7 @@ export function useData(): UseDataReturn {
   const updatePayment = async (id: string, updates: Partial<Payment>) => {
     const { data, error } = await supabase
       .from("payments")
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq("id", id)
       .select()
       .single()
@@ -303,17 +360,21 @@ export function useData(): UseDataReturn {
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      payments: prev.payments.map((p: Payment) => p.id === id ? data : p)
+      payments: prev.payments.map(payment => payment.id === id ? data : payment)
     }))
     return data
   }
 
   const deletePayment = async (id: string) => {
-    const { error } = await supabase.from("payments").delete().eq("id", id)
+    const { error } = await supabase
+      .from("payments")
+      .delete()
+      .eq("id", id)
+
     if (error) throw error
     setState((prev: DataState) => ({
       ...prev,
-      payments: prev.payments.filter((p: Payment) => p.id !== id)
+      payments: prev.payments.filter(payment => payment.id !== id)
     }))
   }
 
