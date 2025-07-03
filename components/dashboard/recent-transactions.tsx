@@ -3,14 +3,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { formatCurrency, formatDate } from "@/lib/utils"
-import { useRevenues } from "@/hooks/use-revenues"
-import { useExpenses } from "@/hooks/use-expenses"
 import { TrendingUp, TrendingDown } from "lucide-react"
+import type { Database } from "@/types/database"
 
-export function RecentTransactions() {
-  const { revenues } = useRevenues()
-  const { expenses } = useExpenses()
+type Revenue = Database["public"]["Tables"]["revenues"]["Row"]
+type Expense = Database["public"]["Tables"]["expenses"]["Row"]
 
+interface RecentTransactionsProps {
+  revenues: Revenue[]
+  expenses: Expense[]
+}
+
+export function RecentTransactions({ revenues, expenses }: RecentTransactionsProps) {
   // Combine and sort transactions
   const transactions = [
     ...revenues.slice(0, 5).map((revenue) => ({
@@ -36,8 +40,8 @@ export function RecentTransactions() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Transactions</CardTitle>
-        <CardDescription>Your latest financial activities</CardDescription>
+        <CardTitle>Transactions Récentes</CardTitle>
+        <CardDescription>Vos dernières activités financières</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -67,11 +71,15 @@ export function RecentTransactions() {
                   {transaction.type === "revenue" ? "+" : "-"}
                   {formatCurrency(transaction.amount)}
                 </p>
-                <Badge variant={transaction.type === "revenue" ? "default" : "destructive"}>{transaction.type}</Badge>
+                <Badge variant={transaction.type === "revenue" ? "default" : "destructive"}>
+                  {transaction.type === "revenue" ? "Revenu" : "Dépense"}
+                </Badge>
               </div>
             </div>
           ))}
-          {transactions.length === 0 && <div className="text-center py-8 text-gray-500">No transactions found</div>}
+          {transactions.length === 0 && (
+            <div className="text-center py-8 text-gray-500">Aucune transaction trouvée</div>
+          )}
         </div>
       </CardContent>
     </Card>

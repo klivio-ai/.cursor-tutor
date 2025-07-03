@@ -1,79 +1,84 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { formatCurrency } from "@/lib/utils"
-import { TrendingUp, TrendingDown, Building2, Users } from "lucide-react"
-import { useProperties } from "@/hooks/use-properties"
-import { useRevenues } from "@/hooks/use-revenues"
-import { useExpenses } from "@/hooks/use-expenses"
-import { useTenants } from "@/hooks/use-tenants"
+import { Building2, TrendingUp, TrendingDown, DollarSign, Euro } from "lucide-react"
 
-export function StatsCards() {
-  const { properties } = useProperties()
-  const { revenues } = useRevenues()
-  const { expenses } = useExpenses()
-  const { tenants } = useTenants()
+interface StatsCardsProps {
+  totalProperties: number
+  totalRevenue: number
+  totalExpenses: number
+  netIncome: number
+  totalValue: number
+}
 
-  // Calculate totals
-  const totalRevenue = revenues.reduce((sum, revenue) => sum + revenue.amount, 0)
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const netIncome = totalRevenue - totalExpenses
-  const totalProperties = properties.length
-  const activeTenants = tenants.filter((tenant) => tenant.status === "active").length
-
+export function StatsCards({ 
+  totalProperties, 
+  totalRevenue, 
+  totalExpenses, 
+  netIncome, 
+  totalValue 
+}: StatsCardsProps) {
   const stats = [
     {
-      title: "Total Revenue",
-      value: formatCurrency(totalRevenue),
-      icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
-    },
-    {
-      title: "Total Expenses",
-      value: formatCurrency(totalExpenses),
-      icon: TrendingDown,
-      color: "text-red-600",
-      bgColor: "bg-red-100",
-    },
-    {
-      title: "Net Income",
-      value: formatCurrency(netIncome),
-      icon: netIncome >= 0 ? TrendingUp : TrendingDown,
-      color: netIncome >= 0 ? "text-green-600" : "text-red-600",
-      bgColor: netIncome >= 0 ? "bg-green-100" : "bg-red-100",
-    },
-    {
-      title: "Properties",
+      title: "Propriétés",
       value: totalProperties.toString(),
       icon: Building2,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
+      description: "Total des biens",
+      trend: { value: 0, isPositive: true }
     },
     {
-      title: "Active Tenants",
-      value: activeTenants.toString(),
-      icon: Users,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
+      title: "Valeur Totale",
+      value: `${totalValue.toLocaleString("fr-FR")} €`,
+      icon: Euro,
+      description: "Valeur du portefeuille",
+      trend: { value: 5, isPositive: true }
     },
+    {
+      title: "Revenus Totaux",
+      value: `${totalRevenue.toLocaleString("fr-FR")} €`,
+      icon: TrendingUp,
+      description: "Revenus générés",
+      trend: { value: 12, isPositive: true }
+    },
+    {
+      title: "Dépenses Totales",
+      value: `${totalExpenses.toLocaleString("fr-FR")} €`,
+      icon: TrendingDown,
+      description: "Coûts engagés",
+      trend: { value: 8, isPositive: false }
+    },
+    {
+      title: "Bénéfice Net",
+      value: `${netIncome.toLocaleString("fr-FR")} €`,
+      icon: DollarSign,
+      description: "Résultat net",
+      trend: { value: 15, isPositive: netIncome > 0 }
+    }
   ]
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-      {stats.map((stat) => (
-        <Card key={stat.title}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            <div className={`p-2 rounded-full ${stat.bgColor}`}>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${stat.color}`}>{stat.value}</div>
-          </CardContent>
-        </Card>
-      ))}
+      {stats.map((stat) => {
+        const Icon = stat.icon
+        return (
+          <Card key={stat.title}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <Icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p className="text-xs text-muted-foreground">{stat.description}</p>
+              <div className="flex items-center text-xs text-muted-foreground mt-1">
+                <span className={stat.trend.isPositive ? "text-green-600" : "text-red-600"}>
+                  {stat.trend.isPositive ? "+" : "-"}{stat.trend.value}%
+                </span>
+                <span className="ml-1">vs mois dernier</span>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }

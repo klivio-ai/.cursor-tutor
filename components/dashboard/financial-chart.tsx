@@ -1,110 +1,113 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
-import { useRevenues } from "@/hooks/use-revenues"
-import { useExpenses } from "@/hooks/use-expenses"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { formatCurrency } from "@/lib/utils"
+import type { Database } from "@/types/database"
 
-export function FinancialChart() {
-  const { revenues } = useRevenues()
-  const { expenses } = useExpenses()
+type Revenue = Database["public"]["Tables"]["revenues"]["Row"]
+type Expense = Database["public"]["Tables"]["expenses"]["Row"]
 
-  // Group data by month
-  const monthlyData = new Map()
+interface FinancialChartProps {
+  revenues: Revenue[]
+  expenses: Expense[]
+}
 
-  revenues.forEach((revenue) => {
-    const month = new Date(revenue.date).toISOString().slice(0, 7) // YYYY-MM
-    if (!monthlyData.has(month)) {
-      monthlyData.set(month, { month, revenue: 0, expenses: 0 })
+export function FinancialChart({ revenues, expenses }: FinancialChartProps) {
+  // Group data by month for the last 6 months
+  const getLast6Months = () => {
+    const months = []
+    const now = new Date()
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      months.push({
+        month: date.toLocaleDateString("fr-FR", { month: "short" }),
+        revenue: 0,
+        expense: 0,
+        net: 0,
+      })
     }
-    monthlyData.get(month).revenue += revenue.amount
+    return months
+  }
+
+  const chartData = getLast6Months()
+
+  // Populate data
+  revenues.forEach((revenue) => {
+    const date = new Date(revenue.date)
+    const monthIndex = chartData.findIndex(
+      (item) => item.month === date.toLocaleDateString("fr-FR", { month: "short" })
+    )
+    if (monthIndex !== -1) {
+      chartData[monthIndex].revenue += revenue.amount
+      chartData[monthIndex].net = chartData[monthIndex].revenue - chartData[monthIndex].expense
+    }
   })
 
   expenses.forEach((expense) => {
-    const month = new Date(expense.date).toISOString().slice(0, 7) // YYYY-MM
-    if (!monthlyData.has(month)) {
-      monthlyData.set(month, { month, revenue: 0, expenses: 0 })
+    const date = new Date(expense.date)
+    const monthIndex = chartData.findIndex(
+      (item) => item.month === date.toLocaleDateString("fr-FR", { month: "short" })
+    )
+    if (monthIndex !== -1) {
+      chartData[monthIndex].expense += expense.amount
+      chartData[monthIndex].net = chartData[monthIndex].revenue - chartData[monthIndex].expense
     }
-    monthlyData.get(month).expenses += expense.amount
   })
 
-  const chartData = Array.from(monthlyData.values())
-    .sort((a, b) => a.month.localeCompare(b.month))
-    .map((data) => ({
-      ...data,
-      netIncome: data.revenue - data.expenses,
-      monthName: new Date(data.month + "-01").toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      }),
-    }))
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border rounded-lg shadow-lg">
+          <p className="font-medium">{label}</p>
+          <p className="text-green-600">Revenus: {formatCurrency(payload[0].value)}</p>
+          <p className="text-red-600">Dépenses: {formatCurrency(payload[1].value)}</p>
+          <p className={`font-bold ${payload[2].value >= 0 ? "text-green-600" : "text-red-600"}`}>
+            Net: {formatCurrency(payload[2].value)}
+          </p>
+        </div>
+      )
+    }
+    return null
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Financial Overview</CardTitle>
-        <CardDescription>Monthly revenue, expenses, and net income</CardDescription>
+        <CardTitle>Évolution Financière</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={{
-            revenue: {
-              label: "Revenue",
-              color: "hsl(var(--chart-1))",
-            },
-            expenses: {
-              label: "Expenses",
-              color: "hsl(var(--chart-2))",
-            },
-            netIncome: {
-              label: "Net Income",
-              color: "hsl(var(--chart-3))",
-            },
-          }}
-          className="h-[300px]"
-        >
+        <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="monthName" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-              <YAxis
-                tick={{ fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `$${value.toLocaleString()}`}
-              />
-              <ChartTooltip
-                content={<ChartTooltipContent />}
-                formatter={(value: number) => [`$${value.toLocaleString()}`, ""]}
-              />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip content={<CustomTooltip />} />
               <Line
                 type="monotone"
                 dataKey="revenue"
-                stroke="var(--color-revenue)"
+                stroke="#10B981"
                 strokeWidth={2}
-                dot={{ fill: "var(--color-revenue)", strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6 }}
+                name="Revenus"
               />
               <Line
                 type="monotone"
-                dataKey="expenses"
-                stroke="var(--color-expenses)"
+                dataKey="expense"
+                stroke="#EF4444"
                 strokeWidth={2}
-                dot={{ fill: "var(--color-expenses)", strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6 }}
+                name="Dépenses"
               />
               <Line
                 type="monotone"
-                dataKey="netIncome"
-                stroke="var(--color-netIncome)"
-                strokeWidth={2}
-                dot={{ fill: "var(--color-netIncome)", strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6 }}
+                dataKey="net"
+                stroke="#3B82F6"
+                strokeWidth={3}
+                name="Net"
               />
             </LineChart>
           </ResponsiveContainer>
-        </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   )
