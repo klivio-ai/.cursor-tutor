@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase"
 import type { Database } from "@/types/database"
 
 type Property = Database["public"]["Tables"]["properties"]["Row"]
+type PropertyInsert = Database["public"]["Tables"]["properties"]["Insert"]
 type Revenue = Database["public"]["Tables"]["revenues"]["Row"]
 type Expense = Database["public"]["Tables"]["expenses"]["Row"]
 type Tenant = Database["public"]["Tables"]["tenants"]["Row"]
@@ -24,7 +25,7 @@ interface DataState {
 
 interface UseDataReturn extends DataState {
   refetch: () => Promise<void>
-  addProperty: (property: Omit<Property, "id" | "created_at" | "updated_at">) => Promise<Property>
+  addProperty: (property: PropertyInsert) => Promise<Property>
   addRevenue: (revenue: Omit<Revenue, "id" | "created_at" | "updated_at">) => Promise<Revenue>
   addExpense: (expense: Omit<Expense, "id" | "created_at" | "updated_at">) => Promise<Expense>
   addTenant: (tenant: Omit<Tenant, "id" | "created_at" | "updated_at">) => Promise<Tenant>
@@ -157,7 +158,7 @@ export function useData(): UseDataReturn {
   }, [])
 
   // CRUD Operations
-  const addProperty = async (property: Omit<Property, "id" | "created_at" | "updated_at">) => {
+  const addProperty = async (property: PropertyInsert) => {
     const { data, error } = await supabase
       .from("properties")
       .insert([property])

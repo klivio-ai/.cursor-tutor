@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Building2, MapPin, DollarSign, Calendar, Edit, Trash2, Eye, Users } from "lucide-react"
 import { DashboardSkeleton } from "@/components/ui/loading"
-import { PropertiesStats } from "./PropertiesStats"
 import { PropertiesMap } from "./PropertiesMap"
 
 export default function PropertiesPage() {
@@ -100,8 +99,8 @@ export default function PropertiesPage() {
         current_value: formData.current_value ? parseFloat(formData.current_value) : null,
         tenant_id: formData.tenant_id === 'vacant' ? null : formData.tenant_id,
         payment_status: formData.payment_status as 'Paid' | 'Pending' | 'Overdue',
-        next_due_date: formData.next_due_date || null,
-      }
+        next_due_date: formData.next_due_date || null
+      } as any
 
       await addProperty(propertyData)
       
@@ -382,7 +381,75 @@ export default function PropertiesPage() {
       </div>
 
       {/* Stats Cards */}
-      <PropertiesStats properties={properties} tenants={tenants} />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Propriétés
+            </CardTitle>
+            <div className="p-2 rounded-lg bg-purple-100">
+              <Building2 className="h-4 w-4 text-purple-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">{properties.length}</div>
+            <p className="text-xs text-gray-500 mt-1">Nombre total de propriétés</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Valeur Totale
+            </CardTitle>
+            <div className="p-2 rounded-lg bg-green-100">
+              <DollarSign className="h-4 w-4 text-green-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">
+              {properties.reduce((sum, prop) => sum + (prop.current_value || 0), 0).toLocaleString('fr-FR')} €
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Valeur totale du portefeuille</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Loyer Mensuel
+            </CardTitle>
+            <div className="p-2 rounded-lg bg-blue-100">
+              <DollarSign className="h-4 w-4 text-blue-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">
+              {properties.reduce((sum, prop) => sum + prop.monthly_rent, 0).toLocaleString('fr-FR')} €
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Revenus locatifs mensuels</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Taux d'Occupation
+            </CardTitle>
+            <div className="p-2 rounded-lg bg-orange-100">
+              <Users className="h-4 w-4 text-orange-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">
+              {properties.length > 0 ? ((properties.filter(prop => prop.tenant_id).length / properties.length) * 100).toFixed(1) : 0}%
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {properties.filter(prop => prop.tenant_id).length} occupées / {properties.filter(prop => !prop.tenant_id).length} vacantes
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Properties Map */}
       <Card>
