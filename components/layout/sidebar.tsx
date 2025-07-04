@@ -14,7 +14,6 @@ import {
   TrendingUp, 
   TrendingDown, 
   CreditCard, 
-  Settings, 
   Menu, 
   LogOut,
   ChevronRight
@@ -28,7 +27,6 @@ const navigation = [
   { name: "Revenus", href: "/revenue", icon: TrendingUp },
   { name: "Dépenses", href: "/expenses", icon: TrendingDown },
   { name: "Paiements", href: "/payments", icon: CreditCard },
-  { name: "Paramètres", href: "/settings", icon: Settings },
 ]
 
 interface SidebarProps {

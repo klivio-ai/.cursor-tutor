@@ -3,12 +3,13 @@
 import { useData } from "@/hooks/use-data"
 import { StatsCards } from "./dashboard/stats-cards"
 import { FinancialChart } from "./dashboard/financial-chart"
+import { DashboardFilters } from "./dashboard/DashboardFilters"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { TrendingUp, Plus, Calendar, DollarSign, TrendingDown, Home, Users, Percent } from "lucide-react"
+import { TrendingUp, TrendingDown } from "lucide-react"
 import { DashboardSkeleton } from "@/components/ui/loading"
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
 import { formatCurrency } from "@/lib/utils"
+import { useState } from "react"
 
 export default function Dashboard() {
   const { 
@@ -21,6 +22,36 @@ export default function Dashboard() {
     loading, 
     error 
   } = useData()
+
+  // État des filtres
+  const [filters, setFilters] = useState({
+    propertyId: null as string | null,
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    period: "current_month" as string
+  })
+
+  // Fonction pour filtrer les données
+  const filterData = (data: any[], dateField: string) => {
+    return data.filter(item => {
+      const itemDate = new Date(item[dateField])
+      
+      // Filtre par propriété si sélectionné
+      if (filters.propertyId && item.property_id && item.property_id !== filters.propertyId) {
+        return false
+      }
+      
+      // Filtre par date si définie
+      if (filters.startDate && itemDate < filters.startDate) {
+        return false
+      }
+      if (filters.endDate && itemDate > filters.endDate) {
+        return false
+      }
+      
+      return true
+    })
+  }
 
   if (loading) {
     return <DashboardSkeleton />
@@ -40,22 +71,13 @@ export default function Dashboard() {
     )
   }
 
-  // Calculs avancés avec vraies données Supabase
-  const currentMonth = new Date().getMonth()
-  const currentYear = new Date().getFullYear()
+  // Calculs avancés avec données filtrées
+  const filteredRevenues = filterData(revenues, 'date')
+  const filteredExpenses = filterData(expenses, 'date')
   
-  // Revenus et dépenses du mois en cours
-  const currentMonthRevenues = revenues.filter(rev => {
-    const date = new Date(rev.date)
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear
-  })
-  const currentMonthExpenses = expenses.filter(exp => {
-    const date = new Date(exp.date)
-    return date.getMonth() === currentMonth && date.getFullYear() === currentYear
-  })
-  
-  const totalRevenue = currentMonthRevenues.reduce((sum, rev) => sum + rev.amount, 0)
-  const totalExpenses = currentMonthExpenses.reduce((sum, exp) => sum + exp.amount, 0)
+  // Revenus et dépenses filtrés
+  const totalRevenue = filteredRevenues.reduce((sum, rev) => sum + rev.amount, 0)
+  const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0)
   const netIncome = totalRevenue - totalExpenses
   
   // Calculs des propriétés
@@ -67,7 +89,7 @@ export default function Dashboard() {
   const occupancyRate = totalProperties > 0 ? ((occupiedProperties / totalProperties) * 100).toFixed(1) : '0.0'
   
   // Calcul du loyer moyen
-  const totalRent = revenues.reduce((sum, rev) => sum + rev.amount, 0)
+  const totalRent = filteredRevenues.reduce((sum, rev) => sum + rev.amount, 0)
   const averageRent = occupiedProperties > 0 ? (totalRent / occupiedProperties).toFixed(0) : '0'
   
   // Calcul de la rentabilité nette
@@ -84,7 +106,7 @@ export default function Dashboard() {
   // Répartition des dépenses par catégorie (V2 moderne)
   const expenseCategories = categories.filter(cat => cat.type === 'expense')
   const expensesByCategory = expenseCategories.map(cat => {
-    const sum = currentMonthExpenses.filter(exp => exp.category_id === cat.id).reduce((acc, exp) => acc + exp.amount, 0)
+    const sum = filteredExpenses.filter(exp => exp.category_id === cat.id).reduce((acc, exp) => acc + exp.amount, 0)
     return {
       id: cat.id,
       name: cat.name,
@@ -111,17 +133,14 @@ export default function Dashboard() {
           </h1>
           <p className="text-gray-600 mt-1">Gestion de Portefeuille Locatif • Mise à jour en temps réel</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="hidden sm:flex">
-            <Calendar className="h-4 w-4 mr-2" />
-            Rapport
-          </Button>
-          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter une Propriété
-          </Button>
-        </div>
+
       </div>
+
+      {/* Filtres Dashboard */}
+      <DashboardFilters 
+        properties={properties}
+        onFiltersChange={setFilters}
+      />
 
       {/* KPI Cards modernisées */}
       <StatsCards 
@@ -144,7 +163,7 @@ export default function Dashboard() {
           <p className="text-gray-600 mt-1">Analyse détaillée de votre performance financière</p>
         </CardHeader>
         <CardContent className="p-6">
-          <FinancialChart revenues={revenues} expenses={expenses} />
+          <FinancialChart revenues={filteredRevenues} expenses={filteredExpenses} />
         </CardContent>
       </Card>
 
