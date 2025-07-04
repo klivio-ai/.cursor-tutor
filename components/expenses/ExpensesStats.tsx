@@ -68,23 +68,30 @@ export function ExpensesStats({ expenses, properties, filteredStats }: ExpensesS
   ]
 
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {statsCards.map((stat, index) => (
-        <Card key={index} className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-red-500">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
+        <Card 
+          key={index} 
+          className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-red-500 bg-white group cursor-pointer"
+        >
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 sm:pb-3">
+            <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 truncate">
               {stat.title}
             </CardTitle>
-            <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
+            <div className={`p-2 sm:p-3 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+              <stat.icon className={`h-3 w-3 sm:h-4 sm:w-4 ${stat.color}`} />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-            <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
+          <CardContent className="space-y-1 sm:space-y-2">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate" title={stat.value}>
+              {stat.value}
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 leading-tight">
+              {stat.description}
+            </p>
             {stat.trend && (
-              <div className="mt-2">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              <div className="pt-1">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 transition-colors group-hover:bg-gray-200">
                   {stat.trend}
                 </span>
               </div>

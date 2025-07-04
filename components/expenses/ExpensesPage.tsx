@@ -302,119 +302,316 @@ export default function ExpensesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Gestion des Dépenses</h1>
-          <p className="text-gray-600 mt-1">Suivez et gérez toutes vos dépenses immobilières.</p>
-        </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-red-600 hover:bg-red-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Nouvelle Dépense
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Ajouter une nouvelle dépense</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="description">Description *</Label>
-                <Input
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  placeholder="Ex: Réparation toiture"
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="amount">Montant (€) *</Label>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
+        <div className="space-y-6 sm:space-y-8">
+          {/* Header */}
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900 truncate">
+                Gestion des Dépenses
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-gray-600 max-w-2xl">
+                Suivez et gérez toutes vos dépenses immobilières en temps réel.
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-xl transition-all duration-200">
+                    <Plus className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Nouvelle Dépense</span>
+                    <span className="sm:hidden">Ajouter</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg sm:text-xl">Ajouter une nouvelle dépense</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="description" className="text-sm font-medium">Description *</Label>
+                      <Input
+                        id="description"
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        placeholder="Ex: Réparation toiture"
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="amount" className="text-sm font-medium">Montant (€) *</Label>
+                        <Input
+                          id="amount"
+                          type="number"
+                          step="0.01"
+                          value={formData.amount}
+                          onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                          placeholder="0.00"
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="vendor" className="text-sm font-medium">Fournisseur *</Label>
+                        <Input
+                          id="vendor"
+                          value={formData.vendor}
+                          onChange={(e) => setFormData({...formData, vendor: e.target.value})}
+                          placeholder="Ex: Entreprise ABC"
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="category" className="text-sm font-medium">Catégorie</Label>
+                        <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Sélectionner une catégorie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Aucune catégorie</SelectItem>
+                            {expenseCategories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="status" className="text-sm font-medium">Statut</Label>
+                        <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Pending">En attente</SelectItem>
+                            <SelectItem value="Paid">Payé</SelectItem>
+                            <SelectItem value="Overdue">En retard</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="date" className="text-sm font-medium">Date de facture *</Label>
+                        <Input
+                          id="date"
+                          type="date"
+                          value={formData.date}
+                          onChange={(e) => setFormData({...formData, date: e.target.value})}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="due_date" className="text-sm font-medium">Date d'échéance</Label>
+                        <Input
+                          id="due_date"
+                          type="date"
+                          value={formData.due_date}
+                          onChange={(e) => setFormData({...formData, due_date: e.target.value})}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="property" className="text-sm font-medium">Propriété</Label>
+                      <Select value={formData.property_id} onValueChange={(value) => setFormData({...formData, property_id: value})}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Sélectionner une propriété" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Aucune propriété</SelectItem>
+                          {properties.map((property) => (
+                            <SelectItem key={property.id} value={property.id}>
+                              {property.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Document</Label>
+                      <FileUpload
+                        onFileUploaded={(fileUrl) => setFormData({...formData, file_url: fileUrl})}
+                        currentFileUrl={formData.file_url}
+                        accept=".pdf"
+                        maxSize={10}
+                        folder="expenses"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="notes" className="text-sm font-medium">Notes</Label>
+                      <Textarea
+                        id="notes"
+                        value={formData.notes}
+                        onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                        placeholder="Notes optionnelles..."
+                        rows={3}
+                        className="w-full resize-none"
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+                      <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="w-full sm:w-auto">
+                        Annuler
+                      </Button>
+                      <Button onClick={handleAddExpense} className="w-full sm:w-auto">
+                        Ajouter
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          {/* Filtres */}
+          <div className="w-full">
+            <ExpensesFilters 
+              properties={properties}
+              categories={categories}
+              onFiltersChange={setFilters}
+            />
+          </div>
+
+          {/* Stats Cards */}
+          <div className="w-full">
+            <ExpensesStats 
+              expenses={expenses} 
+              properties={properties}
+              filteredStats={filteredStats}
+            />
+          </div>
+
+          {/* Chart */}
+          <Card className="w-full shadow-sm border-0 bg-white">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center text-lg sm:text-xl">
+                <TrendingDown className="h-5 w-5 mr-2 text-red-600" />
+                Évolution des Dépenses
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6">
+              <ExpensesChart expenses={filteredExpenses} showTitle={false} />
+            </CardContent>
+          </Card>
+
+          {/* Expenses Table */}
+          <div className="w-full">
+            <ExpensesTable
+              expenses={filteredExpenses}
+              properties={properties}
+              categories={categories}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
+              onView={handleViewExpense}
+            />
+          </div>
+
+          {/* Edit Dialog */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="w-[95vw] max-w-[600px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg sm:text-xl">Modifier la dépense</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-description" className="text-sm font-medium">Description *</Label>
                   <Input
-                    id="amount"
-                    type="number"
-                    step="0.01"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    placeholder="0.00"
+                    id="edit-description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    placeholder="Ex: Réparation toiture"
+                    className="w-full"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="vendor">Fournisseur *</Label>
-                  <Input
-                    id="vendor"
-                    value={formData.vendor}
-                    onChange={(e) => setFormData({...formData, vendor: e.target.value})}
-                    placeholder="Ex: Entreprise ABC"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-amount" className="text-sm font-medium">Montant (€) *</Label>
+                    <Input
+                      id="edit-amount"
+                      type="number"
+                      step="0.01"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                      placeholder="0.00"
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-vendor" className="text-sm font-medium">Fournisseur *</Label>
+                    <Input
+                      id="edit-vendor"
+                      value={formData.vendor}
+                      onChange={(e) => setFormData({...formData, vendor: e.target.value})}
+                      placeholder="Ex: Entreprise ABC"
+                      className="w-full"
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="category">Catégorie</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner une catégorie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Aucune catégorie</SelectItem>
-                      {expenseCategories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-category" className="text-sm font-medium">Catégorie</Label>
+                    <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Sélectionner une catégorie" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucune catégorie</SelectItem>
+                        {expenseCategories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-status" className="text-sm font-medium">Statut</Label>
+                    <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Pending">En attente</SelectItem>
+                        <SelectItem value="Paid">Payé</SelectItem>
+                        <SelectItem value="Overdue">En retard</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div>
-                  <Label htmlFor="status">Statut</Label>
-                  <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pending">En attente</SelectItem>
-                      <SelectItem value="Paid">Payé</SelectItem>
-                      <SelectItem value="Overdue">En retard</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-date" className="text-sm font-medium">Date de facture *</Label>
+                    <Input
+                      id="edit-date"
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({...formData, date: e.target.value})}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-due_date" className="text-sm font-medium">Date d'échéance</Label>
+                    <Input
+                      id="edit-due_date"
+                      type="date"
+                      value={formData.due_date}
+                      onChange={(e) => setFormData({...formData, due_date: e.target.value})}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="date">Date de facture *</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="due_date">Date d'échéance</Label>
-                  <Input
-                    id="due_date"
-                    type="date"
-                    value={formData.due_date}
-                    onChange={(e) => setFormData({...formData, due_date: e.target.value})}
-                  />
-                </div>
-              </div>
-              
-                <div>
-                  <Label htmlFor="property">Propriété</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-property" className="text-sm font-medium">Propriété</Label>
                   <Select value={formData.property_id} onValueChange={(value) => setFormData({...formData, property_id: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Sélectionner une propriété" />
                     </SelectTrigger>
                     <SelectContent>
-                    <SelectItem value="none">Aucune propriété</SelectItem>
+                      <SelectItem value="none">Aucune propriété</SelectItem>
                       {properties.map((property) => (
                         <SelectItem key={property.id} value={property.id}>
                           {property.name}
@@ -423,208 +620,30 @@ export default function ExpensesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              
-              <FileUpload
-                onFileUploaded={(fileUrl) => setFormData({...formData, file_url: fileUrl})}
-                currentFileUrl={formData.file_url}
-                accept=".pdf"
-                maxSize={10}
-                folder="expenses"
-              />
-              
-              <div>
-                <Label htmlFor="notes">Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  placeholder="Notes optionnelles..."
-                  rows={3}
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="edit-notes" className="text-sm font-medium">Notes</Label>
+                  <Textarea
+                    id="edit-notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                    placeholder="Notes optionnelles..."
+                    rows={3}
+                    className="w-full resize-none"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
+                  <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full sm:w-auto">
+                    Annuler
+                  </Button>
+                  <Button onClick={handleUpdateExpense} className="w-full sm:w-auto">
+                    Mettre à jour
+                  </Button>
+                </div>
               </div>
-              
-              <div className="flex justify-end gap-3 pt-4">
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Annuler
-                </Button>
-                <Button onClick={handleAddExpense}>
-                  Ajouter
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-
-      {/* Filtres */}
-      <ExpensesFilters 
-        properties={properties}
-        categories={categories}
-        onFiltersChange={setFilters}
-      />
-
-      {/* Stats Cards */}
-      <ExpensesStats 
-        expenses={expenses} 
-        properties={properties}
-        filteredStats={filteredStats}
-      />
-
-      {/* Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-lg">
-            <TrendingDown className="h-5 w-5 mr-2 text-red-600" />
-            Évolution des Dépenses
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ExpensesChart expenses={filteredExpenses} />
-        </CardContent>
-      </Card>
-
-      {/* Expenses Table */}
-      <ExpensesTable
-        expenses={filteredExpenses}
-        properties={properties}
-        categories={categories}
-        onEdit={handleEditExpense}
-        onDelete={handleDeleteExpense}
-        onView={handleViewExpense}
-      />
-
-      {/* Edit Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Modifier la dépense</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-description">Description *</Label>
-              <Input
-                id="edit-description"
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Ex: Réparation toiture"
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit-amount">Montant (€) *</Label>
-                <Input
-                  id="edit-amount"
-                  type="number"
-                  step="0.01"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                  placeholder="0.00"
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-vendor">Fournisseur *</Label>
-                <Input
-                  id="edit-vendor"
-                  value={formData.vendor}
-                  onChange={(e) => setFormData({...formData, vendor: e.target.value})}
-                  placeholder="Ex: Entreprise ABC"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit-category">Catégorie</Label>
-                <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une catégorie" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Aucune catégorie</SelectItem>
-                    {expenseCategories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="edit-status">Statut</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Pending">En attente</SelectItem>
-                    <SelectItem value="Paid">Payé</SelectItem>
-                    <SelectItem value="Overdue">En retard</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="edit-date">Date de facture *</Label>
-                <Input
-                  id="edit-date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="edit-due_date">Date d'échéance</Label>
-                <Input
-                  id="edit-due_date"
-                  type="date"
-                  value={formData.due_date}
-                  onChange={(e) => setFormData({...formData, due_date: e.target.value})}
-                />
-              </div>
-            </div>
-            
-              <div>
-                <Label htmlFor="edit-property">Propriété</Label>
-                <Select value={formData.property_id} onValueChange={(value) => setFormData({...formData, property_id: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une propriété" />
-                  </SelectTrigger>
-                  <SelectContent>
-                  <SelectItem value="none">Aucune propriété</SelectItem>
-                    {properties.map((property) => (
-                      <SelectItem key={property.id} value={property.id}>
-                        {property.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            
-            <div>
-              <Label htmlFor="edit-notes">Notes</Label>
-              <Textarea
-                id="edit-notes"
-                value={formData.notes}
-                onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                placeholder="Notes optionnelles..."
-                rows={3}
-              />
-            </div>
-            
-            <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                Annuler
-              </Button>
-              <Button onClick={handleUpdateExpense}>
-                Mettre à jour
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 } 
